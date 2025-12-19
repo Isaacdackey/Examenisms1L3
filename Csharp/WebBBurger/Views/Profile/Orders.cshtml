@@ -1,0 +1,140 @@
+@model IEnumerable<WebBBurger.Models.Commande>
+@{
+    ViewData["Title"] = "Mes Commandes - Brasil Burger";
+}
+
+<div class="container mt-4">
+    <h1 class="mb-4"><i class="fas fa-history"></i> Mes Commandes</h1>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    @if (Model == null || !Model.Any())
+    {
+        <div class="alert alert-info">
+            <h4><i class="fas fa-info-circle"></i> Aucune commande trouvée</h4>
+            <p>Vous n'avez pas encore passé de commande.</p>
+            <a href="@Url.Action("Index", "Home")" class="btn btn-primary">
+                <i class="fas fa-utensils"></i> Commander maintenant
+            </a>
+        </div>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead class="table-dark">
+                    <tr>
+                        <th>N° Commande</th>
+                        <th>Date</th>
+                        <th>Montant</th>
+                        <th>Statut</th>
+                        <th>Type</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var order in Model)
+                    {
+                        <tr>
+                            <td>
+                                @if (!string.IsNullOrEmpty(order.Numero) && order.Numero.StartsWith("CMD-"))
+                                {
+                                    <strong>@order.Numero</strong>
+                                }
+                                else if (!string.IsNullOrEmpty(order.Numero))
+                                {
+                                    <span class="text-muted">@order.Numero</span>
+                                }
+                                else
+                                {
+                                    <span class="text-muted">Commande #@order.Id</span>
+                                }
+                            </td>
+                            <td>@order.CreatedAt.ToString("dd/MM/yyyy HH:mm")</td>
+                            <td class="fw-bold">@order.MontantTotal.ToString("N0") FCFA</td>
+                            <td>
+                                <span class="badge @GetStatusBadgeClass(order.Statut)">
+                                    @GetStatusDisplay(order.Statut)
+                                </span>
+                            </td>
+                            <td>@GetTypeRetraitDisplay(order.TypeRetrait)</td>
+                            <td>
+                                <a href="@Url.Action("Details", "Order", new { id = order.Id })" 
+                                   class="btn btn-sm btn-outline-primary">
+                                    <i class="fas fa-eye"></i> Détails
+                                </a>
+                                @if (order.Statut == "EN_ATTENTE")
+                                {
+                                    <a href="@Url.Action("Cancel", "Order", new { id = order.Id })" 
+                                       class="btn btn-sm btn-outline-danger"
+                                       onclick="return confirm('Êtes-vous sûr de vouloir annuler cette commande ?');">
+                                        <i class="fas fa-times"></i> Annuler
+                                    </a>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="mt-4">
+            <a href="@Url.Action("Index")" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left"></i> Retour au profil
+            </a>
+        </div>
+    }
+</div>
+
+@functions {
+    string GetStatusBadgeClass(string statut)
+    {
+        return statut switch
+        {
+            "EN_ATTENTE" => "bg-warning text-dark",
+            "VALIDEE" => "bg-info text-white",
+            "EN_PREPARATION" => "bg-primary text-white",
+            "PRETE" => "bg-secondary text-white",
+            "EN_LIVRAISON" => "bg-info text-white",
+            "LIVREE" => "bg-success text-white",
+            "TERMINEE" => "bg-success text-white",
+            "PAYE" => "bg-success text-white",
+            "ANNULEE" => "bg-danger text-white",
+            _ => "bg-secondary text-white"
+        };
+    }
+    
+    string GetStatusDisplay(string statut)
+    {
+        return statut switch
+        {
+            "EN_ATTENTE" => "En attente",
+            "VALIDEE" => "Validée",
+            "EN_PREPARATION" => "En préparation",
+            "PRETE" => "Prête",
+            "EN_LIVRAISON" => "En livraison",
+            "LIVREE" => "Livrée",
+            "TERMINEE" => "Terminée",
+            "PAYE" => "Payée",
+            "ANNULEE" => "Annulée",
+            _ => statut
+        };
+    }
+    
+    string GetTypeRetraitDisplay(string typeRetrait)
+    {
+        return typeRetrait switch
+        {
+            "SUR_PLACE" => "Sur place",
+            "A_EMPORTER" => "À emporter",
+            "LIVRAISON" => "Livraison",
+            _ => typeRetrait
+        };
+    }
+}

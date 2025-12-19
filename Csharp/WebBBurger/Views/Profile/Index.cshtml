@@ -1,0 +1,403 @@
+@model WebBBurger.Models.User
+@{
+    ViewData["Title"] = "Mon Profil - Brasil Burger";
+}
+
+<div class="container mt-4">
+    <h1 class="mb-4"><i class="fas fa-user-circle"></i> Mon Profil</h1>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="fas fa-check-circle"></i> @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="fas fa-exclamation-circle"></i> @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    @if (!ViewData.ModelState.IsValid)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <h5><i class="fas fa-exclamation-triangle"></i> Erreurs de validation :</h5>
+            <ul class="mb-0">
+                @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+                {
+                    <li>@error.ErrorMessage</li>
+                }
+            </ul>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="fas fa-info-circle"></i> Informations personnelles</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label text-muted">Nom complet</label>
+                            <p class="h5">@Model.FullName</p>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label text-muted">Email</label>
+                            <p class="h5">
+                                <i class="fas fa-envelope text-primary me-2"></i>
+                                @Model.Email
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label text-muted">Téléphone</label>
+                            <p class="h5">
+                                <i class="fas fa-phone text-primary me-2"></i>
+                                @Model.Tel
+                            </p>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label text-muted">Rôle</label>
+                            <p class="h5">
+                                <span class="badge @(Model.Role == "CLIENT" ? "bg-success" : Model.Role == "ADMIN" ? "bg-danger" : "bg-primary")">
+                                    <i class="fas fa-user-shield me-1"></i>
+                                    @Model.Role
+                                </span>
+                            </p>
+                        </div>
+                    </div>
+
+                    @if (!string.IsNullOrEmpty(Model.Adresse) || !string.IsNullOrEmpty(Model.Quartier))
+                    {
+                        <div class="row">
+                            <div class="col-12 mb-3">
+                                <label class="form-label text-muted">Adresse</label>
+                                <p class="h5">
+                                    <i class="fas fa-map-marker-alt text-primary me-2"></i>
+                                    @if (!string.IsNullOrEmpty(Model.Adresse))
+                                    {
+                                        @Model.Adresse
+                                    }
+                                    @if (!string.IsNullOrEmpty(Model.Quartier))
+                                    {
+                                        <span class="text-muted">(@Model.Quartier)</span>
+                                    }
+                                </p>
+                            </div>
+                        </div>
+                    }
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label text-muted">Date d'inscription</label>
+                            <p class="h6">
+                                <i class="fas fa-calendar-alt text-primary me-2"></i>
+                                @Model.CreatedAt.ToString("dd/MM/yyyy HH:mm")
+                            </p>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label text-muted">Statut du compte</label>
+                            <p class="h6">
+                                @if (Model.IsActive)
+                                {
+                                    <span class="badge bg-success">
+                                        <i class="fas fa-check-circle me-1"></i> Actif
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-danger">
+                                        <i class="fas fa-times-circle me-1"></i> Inactif
+                                    </span>
+                                }
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="mt-4 d-flex gap-2">
+                        <a href="@Url.Action("Edit")" class="btn btn-primary">
+                            <i class="fas fa-edit me-2"></i> Modifier mon profil
+                        </a>
+                        <a href="@Url.Action("Orders")" class="btn btn-outline-secondary">
+                            <i class="fas fa-history me-2"></i> Historique des commandes
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mb-4">
+                <div class="card-header bg-warning text-dark">
+                    <h5 class="mb-0"><i class="fas fa-key"></i> Changer mon mot de passe</h5>
+                </div>
+                <div class="card-body">
+                    <form asp-action="ChangePassword" asp-controller="Profile" method="post" id="changePasswordForm">
+                        @Html.AntiForgeryToken()
+                        
+                        <div class="row">
+                            <div class="col-md-12 mb-3">
+                                <label for="OldPassword" class="form-label">Ancien mot de passe *</label>
+                                <input type="password" name="OldPassword" id="OldPassword" class="form-control" required 
+                                       placeholder="Entrez votre ancien mot de passe" />
+                                <div class="form-text">Le mot de passe actuel de votre compte.</div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="NewPassword" class="form-label">Nouveau mot de passe *</label>
+                                <input type="password" name="NewPassword" id="NewPassword" class="form-control" required 
+                                       placeholder="Entrez le nouveau mot de passe" />
+                                <div class="form-text">Minimum 6 caractères.</div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="ConfirmNewPassword" class="form-label">Confirmer le mot de passe *</label>
+                                <input type="password" name="ConfirmNewPassword" id="ConfirmNewPassword" class="form-control" required 
+                                       placeholder="Confirmez le nouveau mot de passe" />
+                                <div class="form-text">Doit correspondre au mot de passe ci-dessus.</div>
+                            </div>
+                        </div>
+                        
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-warning">
+                                <i class="fas fa-key me-2"></i> Changer le mot de passe
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card mb-4">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0"><i class="fas fa-chart-bar"></i> Mes statistiques</h5>
+                </div>
+                <div class="card-body">
+                    <div class="text-center mb-4">
+                        <div class="display-4 text-primary fw-bold">@ViewBag.OrderCount</div>
+                        <p class="text-muted mb-0">Commandes passées</p>
+                        <small class="text-muted">Total de vos commandes</small>
+                    </div>
+                    
+                    <div class="text-center mb-4">
+                        <div class="h2 text-success fw-bold">
+                            @((ViewBag.TotalSpent ?? 0).ToString("N0")) FCFA
+                        </div>
+                        <p class="text-muted mb-0">Total dépensé</p>
+                        <small class="text-muted">Montant total de vos achats</small>
+                    </div>
+                    
+                    @if (ViewBag.LastOrderDate != null)
+                    {
+                        <div class="text-center mb-3">
+                            <div class="h4 text-warning fw-bold">
+                                @(((DateTime)ViewBag.LastOrderDate).ToString("dd/MM/yyyy"))
+                            </div>
+                            <p class="text-muted mb-0">Dernière commande</p>
+                            @if (ViewBag.LastOrderStatus != null)
+                            {
+                                <small class="text-muted">
+                                    Statut: 
+                                    <span class="badge @((string)ViewBag.LastOrderStatus == "TERMINEE" ? "bg-success" : 
+                                                      (string)ViewBag.LastOrderStatus == "EN_ATTENTE" ? "bg-warning" : 
+                                                      "bg-secondary")">
+                                        @ViewBag.LastOrderStatus
+                                    </span>
+                                </small>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="text-center mb-3">
+                            <div class="h4 text-secondary">Aucune commande</div>
+                            <p class="text-muted">Vous n'avez pas encore passé de commande</p>
+                        </div>
+                    }
+                </div>
+            </div>
+
+            
+            <div class="card mb-4">
+                <div class="card-header bg-secondary text-white">
+                    <h5 class="mb-0"><i class="fas fa-bolt"></i> Actions rapides</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <a href="@Url.Action("Orders")" class="btn btn-outline-primary text-start">
+                            <i class="fas fa-shopping-bag me-2"></i> Mes commandes
+                        </a>
+                        <a href="@Url.Action("Index", "Home")" class="btn btn-outline-success text-start">
+                            <i class="fas fa-utensils me-2"></i> Commander maintenant
+                        </a>
+                        <a href="@Url.Action("Edit")" class="btn btn-outline-info text-start">
+                            <i class="fas fa-user-edit me-2"></i> Modifier mon profil
+                        </a>
+                        <a href="@Url.Action("Index", "Cart")" class="btn btn-outline-warning text-start">
+                            <i class="fas fa-shopping-cart me-2"></i> Mon panier
+                        </a>
+                        <a href="@Url.Action("Logout", "Account")" class="btn btn-outline-danger text-start"
+                           onclick="return confirm('Êtes-vous sûr de vouloir vous déconnecter ?');">
+                            <i class="fas fa-sign-out-alt me-2"></i> Déconnexion
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            
+            <div class="card">
+                <div class="card-header bg-dark text-white">
+                    <h5 class="mb-0"><i class="fas fa-shield-alt"></i> Sécurité du compte</h5>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info small">
+                        <h6><i class="fas fa-lightbulb me-2"></i> Pour votre sécurité :</h6>
+                        <ul class="mb-0 ps-3">
+                            <li>Ne partagez jamais votre mot de passe</li>
+                            <li>Utilisez un mot de passe unique</li>
+                            <li>Changez régulièrement votre mot de passe</li>
+                            <li>Déconnectez-vous sur les appareils publics</li>
+                            <li>Vérifiez votre historique de connexions</li>
+                            <li>Signalez toute activité suspecte</li>
+                        </ul>
+                    </div>
+                    <div class="text-center mt-3">
+                        <a href="@Url.Action("Privacy")" class="btn btn-sm btn-outline-dark">
+                            <i class="fas fa-lock me-1"></i> Politique de confidentialité
+                        </a>
+                        <a href="@Url.Action("Help")" class="btn btn-sm btn-outline-dark ms-2">
+                            <i class="fas fa-question-circle me-1"></i> Aide
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            $('#changePasswordForm').submit(function(e) {
+                const oldPassword = $('#OldPassword').val();
+                const newPassword = $('#NewPassword').val();
+                const confirmPassword = $('#ConfirmNewPassword').val();
+                
+                
+                if (oldPassword.trim() === '') {
+                    alert('Veuillez entrer votre ancien mot de passe !');
+                    e.preventDefault();
+                    return false;
+                }
+                
+                
+                if (newPassword !== confirmPassword) {
+                    alert('Les nouveaux mots de passe ne correspondent pas !');
+                    e.preventDefault();
+                    return false;
+                }
+                
+                
+                if (newPassword.length < 6) {
+                    alert('Le nouveau mot de passe doit contenir au moins 6 caractères !');
+                    e.preventDefault();
+                    return false;
+                }
+                
+
+                if (oldPassword === newPassword) {
+                    alert('Le nouveau mot de passe doit être différent de l\'ancien !');
+                    e.preventDefault();
+                    return false;
+                }
+                
+                
+                if (!confirm('Êtes-vous sûr de vouloir changer votre mot de passe ?')) {
+                    e.preventDefault();
+                    return false;
+                }
+                
+                return true;
+            });
+
+            $('.password-toggle').click(function() {
+                const target = $(this).data('target');
+                const input = $(target);
+                const icon = $(this).find('i');
+                
+                if (input.attr('type') === 'password') {
+                    input.attr('type', 'text');
+                    icon.removeClass('fa-eye').addClass('fa-eye-slash');
+                } else {
+                    input.attr('type', 'password');
+                    icon.removeClass('fa-eye-slash').addClass('fa-eye');
+                }
+            });
+
+            
+            if ($('.alert-success').length > 0) {
+                setTimeout(function() {
+                    $('.alert-success').fadeOut(1000);
+                }, 5000);
+            }
+        });
+    </script>
+
+    <style>
+        .card {
+            border: none;
+            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+            transition: transform 0.2s;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+        }
+        
+        .card-header {
+            border-bottom: 2px solid rgba(0,0,0,.125);
+        }
+        
+        .badge {
+            font-size: 0.85em;
+            padding: 0.5em 1em;
+        }
+        
+        .form-control:focus {
+            border-color: #0d6efd;
+            box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+        }
+        
+        .btn {
+            border-radius: 0.375rem;
+            transition: all 0.2s;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+        
+        .display-4 {
+            font-weight: 700;
+            color: #0d6efd;
+        }
+        
+        .text-success {
+            color: #198754 !important;
+        }
+        
+        .text-warning {
+            color: #ffc107 !important;
+        }
+    </style>
+}
