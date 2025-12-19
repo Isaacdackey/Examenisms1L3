@@ -1,0 +1,108 @@
+@model WebBBurger.Models.ViewModels.ProductViewModel
+@{
+    ViewData["Title"] = $"{Model.Libelle} - Brasil Burger";
+}
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card">
+                <img src="@Model.ImageUrl" class="card-img-top" alt="@Model.Libelle" 
+                     style="height: 400px; object-fit: cover;">
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h1 class="card-title">@Model.Libelle</h1>
+                    
+                    @if (Model.TypeProduct == "MENU" && Model.PrixOriginal > 0)
+                    {
+                        <div class="mb-3">
+                            <span class="text-muted text-decoration-line-through h5">
+                                @Model.PrixOriginal.ToString("C0") FCFA
+                            </span>
+                            <span class="h3 text-danger ms-2">@Model.Prix.ToString("C0") FCFA</span>
+                            <span class="badge bg-danger ms-2">Économisez @((Model.PrixOriginal - Model.Prix).ToString("C0")) FCFA</span>
+                        </div>
+                    }
+                    else
+                    {
+                        <h3 class="text-primary mb-3">@Model.Prix.ToString("C0") FCFA</h3>
+                    }
+
+                    <p class="card-text">@Model.Description</p>
+
+                    @if (Model.TypeProduct == "BURGER")
+                    {
+                        <div class="mb-3">
+                            <h5>Informations nutritionnelles :</h5>
+                            <ul class="list-unstyled">
+                                <li><i class="fas fa-fire"></i> Calories : @(Model.Calories?.ToString() ?? "N/A")</li>
+                                <li><i class="fas fa-clock"></i> Préparation : @(Model.TempsPreparation?.ToString() ?? "N/A") min</li>
+                                <li><i class="fas fa-hamburger"></i> Type : @(Model.TypeBurger ?? "Classique")</li>
+                            </ul>
+                        </div>
+                    }
+                    else if (Model.TypeProduct == "COMPLEMENT")
+                    {
+                        <div class="mb-3">
+                            <h5>Détails :</h5>
+                            <ul class="list-unstyled">
+                                <li><i class="fas fa-wine-bottle"></i> Type : @(Model.TypeComplement ?? "Boisson")</li>
+                                <li><i class="fas fa-weight"></i> Volume : @(Model.Volume ?? "N/A")</li>
+                            </ul>
+                        </div>
+                    }
+                    else if (Model.TypeProduct == "MENU")
+                    {
+                        <div class="mb-3">
+                            <h5>Composition du menu :</h5>
+                            <ul class="list-unstyled">
+                                <li><i class="fas fa-hamburger"></i> Burger : @(Model.BurgerName ?? "Non spécifié")</li>
+                                <li><i class="fas fa-wine-bottle"></i> Boisson : @(Model.BoissonName ?? "Non spécifié")</li>
+                                <li><i class="fas fa-french-fries"></i> Frites : @(Model.FritesName ?? "Non spécifié")</li>
+                            </ul>
+                        </div>
+                    }
+
+                    @if (Model.TypeProduct == "BURGER")
+                    {
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle"></i> 
+                            Pour personnaliser votre burger avec boisson et frites,
+                            <a href="@Url.Action("AddBurgerWithComplements", "Home", new { id = Model.Id })" class="alert-link">
+                                cliquez ici
+                            </a>
+                        </div>
+                    }
+                    else
+                    {
+                        <form asp-action="AddToCart" asp-controller="Cart" method="post" class="mt-4">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="productId" value="@Model.Id" />
+                            
+                            <div class="row mb-3">
+                                <div class="col-md-4">
+                                    <label for="quantity" class="form-label">Quantité :</label>
+                                    <input type="number" id="quantity" name="quantity" 
+                                           class="form-control" value="1" min="1" max="10">
+                                </div>
+                            </div>
+
+                            <div class="d-grid gap-2">
+                                <button type="submit" class="btn btn-primary btn-lg">
+                                    <i class="fas fa-cart-plus"></i> Ajouter au panier
+                                </button>
+                                <a href="@Url.Action("Index")" class="btn btn-outline-secondary">
+                                    <i class="fas fa-arrow-left"></i> Retour au catalogue
+                                </a>
+                            </div>
+                        </form>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

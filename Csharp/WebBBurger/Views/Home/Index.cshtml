@@ -1,0 +1,273 @@
+@model IEnumerable<WebBBurger.Models.ViewModels.ProductViewModel>
+@{
+
+    var typeParam = Context.Request.Query["type"].ToString();
+    var searchParam = Context.Request.Query["search"].ToString();
+    
+
+    var currentFilter = !string.IsNullOrEmpty(typeParam) ? typeParam : 
+                       !string.IsNullOrEmpty(searchParam) ? searchParam : null;
+    
+    string pageTitle = "Catalogue - Brasil Burger";
+    string pageSubtitle = "Découvrez nos burgers artisanaux préparés avec des ingrédients frais et locaux.";
+    
+    if (!string.IsNullOrEmpty(typeParam))
+    {
+        pageTitle = typeParam.ToLower() switch
+        {
+            "burger" => "Nos Burgers - Brasil Burger",
+            "menu" => "Nos Menus - Brasil Burger",
+            "complement" => "Nos Compléments - Brasil Burger",
+            _ => $"Nos Produits {typeParam} - Brasil Burger"
+        };
+    }
+    else if (!string.IsNullOrEmpty(searchParam))
+    {
+        pageTitle = $"Recherche : {searchParam} - Brasil Burger";
+        pageSubtitle = "Résultats de votre recherche";
+    }
+}
+
+<div class="container mt-4">
+
+    @if (!string.IsNullOrEmpty(currentFilter))
+    {
+        <div class="alert alert-info alert-dismissible fade show mb-4" role="alert">
+            <i class="fas fa-filter me-2"></i>
+            <strong>Filtre actif :</strong> 
+            @if (!string.IsNullOrEmpty(typeParam))
+            {
+                @switch (typeParam.ToLower())
+                {
+                    case "burger": <text>Burgers</text>; break;
+                    case "menu": <text>Menus</text>; break;
+                    case "complement": <text>Compléments</text>; break;
+                    default: @typeParam; break;
+                }
+            }
+            else if (!string.IsNullOrEmpty(searchParam))
+            {
+                <text>Recherche : @searchParam</text>
+            }
+            <a href="/" class="btn-close" aria-label="Supprimer le filtre"></a>
+        </div>
+    }
+
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1 class="display-4">@pageTitle</h1>
+            <p class="lead">@pageSubtitle</p>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title"><i class="fas fa-filter"></i> Filtres</h5>
+                    <div class="btn-group-vertical w-100" role="group">
+                        <a href="/" 
+                           class="btn @(string.IsNullOrEmpty(typeParam) ? "btn-primary" : "btn-outline-primary") mb-2">
+                            <i class="fas fa-th-large"></i> Tous les produits
+                        </a>
+                        
+                        <a href="/?type=burger" 
+                           class="btn @(typeParam?.ToLower() == "burger" ? "btn-primary" : "btn-outline-primary") mb-2">
+                            <i class="fas fa-hamburger"></i> Burgers
+                        </a>
+                        
+
+                        <a href="/?type=menu" 
+                           class="btn @(typeParam?.ToLower() == "menu" ? "btn-primary" : "btn-outline-primary") mb-2">
+                            <i class="fas fa-utensils"></i> Menus
+                        </a>
+                        
+
+                        <a href="/?type=complement" 
+                           class="btn @(typeParam?.ToLower() == "complement" ? "btn-primary" : "btn-outline-primary") mb-2">
+                            <i class="fas fa-french-fries"></i> Compléments
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="row mb-4">
+        <div class="col-12">
+            <form method="get" class="d-flex">
+                <input type="text" name="search" class="form-control me-2" 
+                       placeholder="Rechercher un produit..." value="@searchParam">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-search"></i> Rechercher
+                </button>
+                
+                @if (!string.IsNullOrEmpty(currentFilter))
+                {
+                    <a href="/" class="btn btn-outline-danger ms-2">
+                        <i class="fas fa-times"></i> Effacer
+                    </a>
+                }
+            </form>
+        </div>
+    </div>
+
+
+    @{
+    
+        var filteredProducts = Model;
+        
+        if (!string.IsNullOrEmpty(typeParam))
+        {
+            var filterType = typeParam.ToUpper();
+            filteredProducts = Model.Where(p => 
+                p.TypeProduct?.ToUpper() == filterType
+            ).ToList();
+        }
+        else if (!string.IsNullOrEmpty(searchParam))
+        {
+            var searchLower = searchParam.ToLower();
+            filteredProducts = Model.Where(p => 
+                (p.Libelle != null && p.Libelle.ToLower().Contains(searchLower)) ||
+                (p.Description != null && p.Description.ToLower().Contains(searchLower))
+            ).ToList();
+        }
+    }
+
+
+    <div class="row">
+        @if (!filteredProducts.Any())
+        {
+            <div class="col-12">
+                <div class="alert alert-warning text-center py-5">
+                    <i class="fas fa-search fa-3x mb-3"></i>
+                    <h3>Aucun produit trouvé</h3>
+                    <p class="text-muted">
+                        @if (!string.IsNullOrEmpty(searchParam))
+                        {
+                            <text>Aucun produit ne correspond à votre recherche "<strong>@searchParam</strong>".</text>
+                        }
+                        else if (!string.IsNullOrEmpty(typeParam))
+                        {
+                            <text>Aucun produit de type <strong>@typeParam</strong> disponible.</text>
+                        }
+                        <br>
+                        Essayez un autre filtre ou <a href="/">consultez tous nos produits</a>.
+                    </p>
+                </div>
+            </div>
+        }
+        else
+        {
+            @foreach (var product in filteredProducts)
+            {
+                <div class="col-md-4 col-lg-3 mb-4">
+                    <div class="card h-100 product-card">
+                        <div class="position-relative">
+                            @if (!string.IsNullOrEmpty(product.ImageUrl))
+                            {
+                                <img src="@product.ImageUrl" class="card-img-top" alt="@product.Libelle" 
+                                     style="height: 200px; object-fit: cover;">
+                            }
+                            else
+                            {
+                                <div class="card-img-top bg-light d-flex align-items-center justify-content-center" 
+                                     style="height: 200px;">
+                                    <i class="fas fa-hamburger fa-3x text-muted"></i>
+                                </div>
+                            }
+                            
+                            <span class="position-absolute top-0 end-0 m-2 badge 
+                                  @(product.TypeProduct?.ToLower() == "burger" ? "bg-danger" : 
+                                    product.TypeProduct?.ToLower() == "menu" ? "bg-success" : "bg-warning")">
+                                @{
+                                    var typeDisplay = product.TypeProduct switch
+                                    {
+                                        "BURGER" => "Burger",
+                                        "MENU" => "Menu", 
+                                        "COMPLEMENT" => "Complément",
+                                        _ => product.TypeProduct
+                                    };
+                                    
+                                    var icon = product.TypeProduct switch
+                                    {
+                                        "BURGER" => "fa-hamburger",
+                                        "MENU" => "fa-utensils",
+                                        "COMPLEMENT" => "fa-french-fries",
+                                        _ => "fa-box"
+                                    };
+                                }
+                                <i class="fas @icon"></i> @typeDisplay
+                            </span>
+                        </div>
+                        
+                        <div class="card-body d-flex flex-column">
+                            <h5 class="card-title">@product.Libelle</h5>
+                            <p class="card-text text-muted flex-grow-1">
+                                @if (!string.IsNullOrEmpty(product.Description) && product.Description.Length > 80)
+                                {
+                                    @product.Description.Substring(0, 80)<text>...</text>
+                                }
+                                else
+                                {
+                                    @product.Description
+                                }
+                            </p>
+                            <div class="d-flex justify-content-between align-items-center mt-auto">
+                                <span class="h5 text-success mb-0">@product.Prix.ToString("N0") FCFA</span>
+                                <a href="@Url.Action("Details", "Home", new { id = product.Id })" 
+                                   class="btn btn-outline-primary">
+                                    <i class="fas fa-eye"></i> Voir
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+    </div>
+</div>
+
+<style>
+    .product-card {
+        transition: transform 0.3s, box-shadow 0.3s;
+        border: 1px solid #e0e0e0;
+        border-radius: 10px;
+        overflow: hidden;
+    }
+    .product-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+    }
+    
+    .badge {
+        font-size: 0.7rem;
+        padding: 5px 10px;
+    }
+    
+    .bg-danger {
+        background-color: #ff6b6b !important;
+        color: white !important;
+    }
+    
+    .bg-success {
+        background-color: #4ecdc4 !important;
+        color: white !important;
+    }
+    
+    .bg-warning {
+        background-color: #ffe66d !important;
+        color: #333 !important;
+    }
+</style>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            // Effacer les filtres
+            $('.btn-close').on('click', function(e) {
+                e.preventDefault();
+                window.location.href = '/';
+            });
+        });
+    </script>
+}
