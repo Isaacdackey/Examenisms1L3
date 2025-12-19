@@ -1,0 +1,109 @@
+@model WebBBurger.Models.ViewModels.CartViewModel
+@{
+    ViewData["Title"] = "Panier - Brasil Burger";
+}
+
+<div class="container mt-4">
+    <h1 class="mb-4">Mon Panier</h1>
+    
+    @if (!Model.Items.Any())
+    {
+        <div class="alert alert-info">
+            <h4 class="alert-heading">Votre panier est vide</h4>
+            <p>Commencez par ajouter des produits à votre panier.</p>
+            <hr>
+            <a href="@Url.Action("Index", "Home")" class="btn btn-primary">
+                <i class="fas fa-shopping-bag"></i> Voir le catalogue
+            </a>
+        </div>
+    }
+    else
+    {
+        <div class="row">
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-header bg-light">
+                        <h5 class="mb-0">Produits (@Model.TotalItems articles)</h5>
+                    </div>
+                    <div class="card-body">
+                        @foreach (var item in Model.Items)
+                        {
+                            <div class="row mb-3 pb-3 border-bottom">
+                                <div class="col-3">
+                                    <img src="@item.ImageUrl" class="img-fluid rounded" 
+                                         alt="@item.Libelle" style="max-height: 100px;">
+                                </div>
+                                <div class="col-6">
+                                    <h6>@item.Libelle</h6>
+                                    <small class="text-muted">@item.Description</small>
+                                    <div class="mt-2">
+                                        <span class="badge bg-info">@item.TypeProduct</span>
+                                    </div>
+                                </div>
+                                <div class="col-3 text-end">
+                                    <div class="input-group input-group-sm mb-2">
+                                        <form asp-action="Update" method="post" class="d-flex">
+                                            <input type="hidden" name="productId" value="@item.ProductId" />
+                                            <input type="number" name="quantity" value="@item.Quantite" 
+                                                   min="1" class="form-control" style="width: 60px;">
+                                            <button type="submit" class="btn btn-outline-secondary btn-sm">
+                                                <i class="fas fa-sync"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                    <div class="h6">@item.SousTotal.ToString("C0")</div>
+                                    <form asp-action="Remove" method="post" class="mt-2">
+                                        <input type="hidden" name="productId" value="@item.ProductId" />
+                                        <button type="submit" class="btn btn-danger btn-sm">
+                                            <i class="fas fa-trash"></i> Supprimer
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        }
+                        
+                        <div class="text-end mt-3">
+                            <form asp-action="Clear" method="post">
+                                <button type="submit" class="btn btn-outline-danger">
+                                    <i class="fas fa-trash"></i> Vider le panier
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-header bg-light">
+                        <h5 class="mb-0">Récapitulatif</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Sous-total:</span>
+                            <span>@Model.Total.ToString("C0")</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Livraison:</span>
+                            <span>À calculer</span>
+                        </div>
+                        <hr>
+                        <div class="d-flex justify-content-between mb-3">
+                            <strong>Total:</strong>
+                            <strong class="h5 text-primary">@Model.Total.ToString("C0")</strong>
+                        </div>
+                        
+                        <div class="d-grid gap-2">
+                            <a href="@Url.Action("Index", "Home")" class="btn btn-outline-primary">
+                                <i class="fas fa-arrow-left"></i> Continuer mes achats
+                            </a>
+                            <a href="@Url.Action("Checkout", "Order")" class="btn btn-success">
+                                <i class="fas fa-lock"></i> Procéder au paiement
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
