@@ -1,0 +1,113 @@
+@model WebBBurger.Models.ViewModels.PaymentViewModel
+@{
+    ViewData["Title"] = "Choix du paiement - Brasil Burger";
+}
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="mb-0"><i class="fas fa-credit-card"></i> Choisir un moyen de paiement</h3>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info mb-4">
+                        <h5><i class="fas fa-receipt"></i> Commande #@Model.NumeroCommande</h5>
+                        <p class="mb-0">Montant à payer : <strong>@Model.Total.ToString("C0") FCFA</strong></p>
+                    </div>
+
+                    
+                    @if (TempData["ErrorMessage"] != null)
+                    {
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            @TempData["ErrorMessage"]
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    }
+
+                    <div class="mb-4">
+                        <h5 class="mb-3">Choisissez votre moyen de paiement :</h5>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <div class="card h-100 text-center">
+                                    <div class="card-body">
+                                        <div class="mb-3">
+                                            <i class="fas fa-mobile-alt fa-3x text-success"></i>
+                                        </div>
+                                        <h5 class="card-title">Wave</h5>
+                                        <p class="card-text">Paiement mobile rapide et sécurisé</p>
+                                        <a href="@Url.Action("SimulatePayment", "Order", new { orderId = Model.CommandeId })" 
+                                           class="btn btn-outline-success">
+                                            <i class="fas fa-hand-holding-usd"></i> Payer Par Wave
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+
+                        
+                            <div class="col-md-6 mb-3">
+                                <div class="card h-100 text-center">
+                                    <div class="card-body">
+                                        <div class="mb-3">
+                                            <i class="fas fa-mobile-alt fa-3x text-warning"></i>
+                                        </div>
+                                        <h5 class="card-title">Orange Money</h5>
+                                        <p class="card-text">Paiement via votre compte Orange Money</p>
+                                        <a href="@Url.Action("SimulatePayment", "Order", new { orderId = Model.CommandeId })" 
+                                           class="btn btn-outline-success">
+                                            <i class="fas fa-hand-holding-usd"></i> Payer par Orange Money
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+
+                            
+                            <div class="col-md-6 mb-3">
+                                <div class="card h-100 text-center">
+                                    <div class="card-body">
+                                        <div class="mb-3">
+                                            <i class="fas fa-credit-card fa-3x text-primary"></i>
+                                        </div>
+                                        <h5 class="card-title">Carte Bancaire</h5>
+                                        <p class="card-text">Paiement sécurisé par carte</p>
+                                        <a href="@Url.Action("SimulatePayment", "Order", new { orderId = Model.CommandeId })" 
+                                           class="btn btn-outline-success">
+                                            <i class="fas fa-hand-holding-usd"></i> Payer Par Carte
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+
+
+                            <div class="col-md-6 mb-3">
+                                <div class="card h-100 text-center">
+                                    <div class="card-body">
+                                        <div class="mb-3">
+                                            <i class="fas fa-money-bill-wave fa-3x text-success"></i>
+                                        </div>
+                                        <h5 class="card-title">Espèces</h5>
+                                        <p class="card-text">Paiement à la livraison ou sur place</p>
+                                        <a href="@Url.Action("SimulatePayment", "Order", new { orderId = Model.CommandeId })" 
+                                           class="btn btn-outline-success">
+                                            <i class="fas fa-hand-holding-usd"></i> Simuler paiement espèces
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    
+
+                    
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-between">
+                        <a href="@Url.Action("Details", "Order", new { id = Model.CommandeId })" class="btn btn-outline-secondary">
+                            <i class="fas fa-arrow-left"></i> Retour aux détails
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,141 @@
+@model WebBBurger.Models.Commande
+@{
+    ViewData["Title"] = "Paiement - Brasil Burger";
+    var totalAPayer = Model.MontantTotal;
+}
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="mb-0"><i class="fas fa-credit-card"></i> Paiement de la commande</h3>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info mb-4">
+                        <h5><i class="fas fa-receipt"></i> Commande #@Model.Id</h5>
+                        <p class="mb-1">Montant à payer : <strong>@totalAPayer.ToString("C0") FCFA</strong></p>
+                        <p class="mb-0">Statut : <span class="badge bg-warning">@Model.StatutDisplay</span></p>
+                    </div>
+
+                    
+                    @if (TempData["SuccessMessage"] != null)
+                    {
+                        <div class="alert alert-success alert-dismissible fade show" role="alert">
+                            @TempData["SuccessMessage"]
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    }
+
+                    @if (TempData["ErrorMessage"] != null)
+                    {
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            @TempData["ErrorMessage"]
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    }
+
+                    <div class="mb-4">
+                        <h5 class="mb-3">Choisissez votre moyen de paiement :</h5>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <div class="card h-100 text-center">
+                                    <div class="card-body">
+                                        <div class="mb-3">
+                                            <i class="fas fa-mobile-alt fa-3x text-success"></i>
+                                        </div>
+                                        <h5 class="card-title">Wave</h5>
+                                        <p class="card-text">Paiement mobile rapide et sécurisé</p>
+                                        <form asp-action="Process" asp-controller="Payment" method="get">
+                                            <input type="hidden" name="commandeId" value="@Model.Id" />
+                                            <input type="hidden" name="moyenPaiement" value="ESPECES" />
+                                            <button type="submit" class="btn btn-success">
+                                                <i class="fas fa-qrcode"></i> Payer avec Wave
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+
+                            
+                            <div class="col-md-6 mb-3">
+                                <div class="card h-100 text-center">
+                                    <div class="card-body">
+                                        <div class="mb-3">
+                                            <i class="fas fa-mobile-alt fa-3x text-warning"></i>
+                                        </div>
+                                        <h5 class="card-title">Orange Money</h5>
+                                        <p class="card-text">Paiement via votre compte Orange Money</p>
+                                        <form asp-action="Process" asp-controller="Payment" method="get">
+                                            <input type="hidden" name="commandeId" value="@Model.Id" />
+                                            <input type="hidden" name="moyenPaiement" value="ESPECES" />
+                                            <button type="submit" class="btn btn-warning text-white">
+                                                <i class="fas fa-mobile-alt"></i> Payer avec Orange Money
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+
+                            
+                            <div class="col-md-6 mb-3">
+                                <div class="card h-100 text-center">
+                                    <div class="card-body">
+                                        <div class="mb-3">
+                                            <i class="fas fa-credit-card fa-3x text-primary"></i>
+                                        </div>
+                                        <h5 class="card-title">Carte Bancaire</h5>
+                                        <p class="card-text">Paiement sécurisé par carte</p>
+                                        <form asp-action="Process" asp-controller="Payment" method="get">
+                                            <input type="hidden" name="commandeId" value="@Model.Id" />
+                                            <input type="hidden" name="moyenPaiement" value="ESPECES" />
+                                            <button type="submit" class="btn btn-primary">
+                                                <i class="fas fa-credit-card"></i> Payer par carte
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+
+                            
+                            <div class="col-md-6 mb-3">
+                                <div class="card h-100 text-center">
+                                    <div class="card-body">
+                                        <div class="mb-3">
+                                            <i class="fas fa-money-bill-wave fa-3x text-success"></i>
+                                        </div>
+                                        <h5 class="card-title">Espèces</h5>
+                                        <p class="card-text">Paiement à la livraison ou sur place</p>
+                                        <form asp-action="Process" asp-controller="Payment" method="get">
+                                            <input type="hidden" name="commandeId" value="@Model.Id" />
+                                            <input type="hidden" name="moyenPaiement" value="ESPECES" />
+                                            <button type="submit" class="btn btn-outline-success">
+                                                <i class="fas fa-hand-holding-usd"></i> Payer en espèces
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-between">
+                        <a href="@Url.Action("Details", "Order", new { id = Model.Id })" class="btn btn-outline-secondary">
+                            <i class="fas fa-arrow-left"></i> Retour aux détails
+                        </a>
+                        
+                        <form asp-action="Cancel" asp-controller="Order" method="post" class="d-inline">
+                            <input type="hidden" name="id" value="@Model.Id" />
+                            <button type="submit" class="btn btn-danger" 
+                                    onclick="return confirm('Êtes-vous sûr de vouloir annuler cette commande ?')">
+                                <i class="fas fa-times-circle"></i> Annuler la commande
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

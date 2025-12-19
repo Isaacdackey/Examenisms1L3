@@ -1,0 +1,171 @@
+@model int?
+@{
+    ViewData["Title"] = "Paiement en espèces - Brasil Burger";
+    var commandeId = Model ?? 0;
+    var commande = ViewData["Commande"] as WebBBurger.Models.Commande;
+    var montantTotal = ViewData["MontantTotal"] as decimal? ?? (commande?.MontantTotal ?? 11950);
+}
+
+<div class="container-fluid py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8 col-md-10">
+            @if (TempData["ErrorMessage"] != null)
+            {
+                <div class="alert alert-danger alert-dismissible fade show mb-4">
+                    <i class="fas fa-exclamation-circle me-2"></i>
+                    @TempData["ErrorMessage"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            }
+            
+            @if (TempData["WarningMessage"] != null)
+            {
+                <div class="alert alert-warning alert-dismissible fade show mb-4">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    @TempData["WarningMessage"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            }
+            
+            <div class="card border-0 shadow-lg">
+                <div class="card-header bg-success text-white py-4">
+                    <div class="row align-items-center">
+                        <div class="col-auto">
+                            <i class="fas fa-money-bill-wave fa-3x"></i>
+                        </div>
+                        <div class="col">
+                            <h1 class="h2 mb-0">Paiement en espèces</h1>
+                            <p class="mb-0 opacity-75">Finalisez votre commande avec un paiement en espèces</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-body p-0">
+                    <div class="row g-0">
+                        <div class="col-md-6 p-5">
+                            <div class="mb-4">
+                                <h3 class="h4 text-success mb-3">
+                                    <i class="fas fa-info-circle me-2"></i>Instructions importantes
+                                </h3>
+                                <div class="alert alert-light border-success">
+                                    <p class="mb-2"><strong>Numéro de commande :</strong></p>
+                                    <h2 class="text-center text-success display-6 fw-bold mb-4">BB-#@commandeId</h2>
+                                    @if (commande != null && commande.Client != null)
+                                    {
+                                        <p class="text-center mb-0">Client : @commande.Client.Nom @commande.Client.Prenom</p>
+                                    }
+                                </div>
+                            </div>
+
+                            <div class="steps mb-5">
+                                <div class="step mb-4">
+                                    <div class="step-icon bg-success text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-2" style="width: 40px; height: 40px;">
+                                        1
+                                    </div>
+                                    <h5 class="h6 mb-1">Préparez le montant exact</h5>
+                                    <p class="text-muted small">Ayez le montant exact de votre commande prêt à être remis.</p>
+                                </div>
+
+                                <div class="step mb-4">
+                                    <div class="step-icon bg-success text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-2" style="width: 40px; height: 40px;">
+                                        2
+                                    </div>
+                                    <h5 class="h6 mb-1">Rendez-vous en caisse</h5>
+                                    <p class="text-muted small">Présentez votre numéro de commande au caissier.</p>
+                                </div>
+
+                                <div class="step mb-4">
+                                    <div class="step-icon bg-success text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-2" style="width: 40px; height: 40px;">
+                                        3
+                                    </div>
+                                    <h5 class="h6 mb-1">Recevez votre reçu</h5>
+                                    <p class="text-muted small">Le caissier vous remettra un reçu de paiement officiel.</p>
+                                </div>
+
+                                <div class="step">
+                                    <div class="step-icon bg-success text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-2" style="width: 40px; height: 40px;">
+                                        4
+                                    </div>
+                                    <h5 class="h6 mb-1">Attendez votre commande</h5>
+                                    <p class="text-muted small">Votre commande sera préparée dès confirmation du paiement.</p>
+                                </div>
+                            </div>
+
+                            <div class="alert alert-warning border-warning">
+                                <div class="d-flex">
+                                    <i class="fas fa-exclamation-triangle fa-2x text-warning me-3"></i>
+                                    <div>
+                                        <h6 class="alert-heading mb-2">Important</h6>
+                                        <p class="mb-2 small">Le paiement en espèces doit être effectué avant la préparation de votre commande.</p>
+                                        <p class="mb-0 small">Conservez votre reçu jusqu'à réception de votre commande.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        
+                        <div class="col-md-6 bg-light p-5">
+                            <h3 class="h4 text-dark mb-4">
+                                <i class="fas fa-receipt me-2"></i>Résumé de votre commande
+                            </h3>
+
+                            <div class="card border-0 mb-4">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between mb-3">
+                                        <span class="h5 text-dark">Total à payer :</span>
+                                        <span class="h4 text-success fw-bold">@montantTotal.ToString("N0") FCFA</span>
+                                    </div>
+
+                                </div>
+                            </div>
+
+                            
+                            <div class="d-grid gap-3">
+                                <form asp-action="CompleteCashPayment" asp-controller="Payment" method="post">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="commandeId" value="@commandeId" />
+                                    
+                                    <button type="submit" 
+                                            class="btn btn-success btn-lg py-3"
+                                            onclick="return confirm('⚠️ Avez-vous vraiment effectué le paiement en caisse ?')">
+                                        <i class="fas fa-check-circle me-2"></i>
+                                        Confirmer le paiement en espèces
+                                    </button>
+                                    
+                                    <p class="text-muted small mt-2 text-center">
+                                        <i class="fas fa-lock me-1"></i> 
+                                        Confirmez uniquement après avoir effectué le paiement en caisse
+                                    </p>
+                                </form>
+
+                                
+                                <div class="d-grid gap-2">
+                                    <a href="@Url.Action("Details", "Order", new { id = commandeId })" 
+                                       class="btn btn-outline-secondary py-2">
+                                        <i class="fas fa-arrow-left me-2"></i>
+                                        Revenir aux détails de la commande
+                                    </a>
+
+                                    <a href="@Url.Action("Index", "Home")" 
+                                       class="btn btn-outline-primary py-2">
+                                        <i class="fas fa-home me-2"></i>
+                                        Retour à l'accueil
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            console.log('Page de paiement en espèces chargée pour la commande BB-#@commandeId');
+            console.log('Montant total:', '@montantTotal FCFA');
+        });
+    </script>
+}
