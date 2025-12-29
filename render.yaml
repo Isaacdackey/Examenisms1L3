@@ -7,7 +7,7 @@ services:
     branch: symfony
 
     rootDir: BBurgerSymfony/BBurgerSymfony
-    dockerContextDir: .
+    dockerContextDir: BBurgerSymfony/BBurgerSymfony
     dockerfilePath: Dockerfile
 
     envVars:
