@@ -11,24 +11,20 @@ services:
       - key: APP_ENV
         value: prod
       - key: APP_SECRET
-        generateValue: true
-      - key: DATABASE_URL
-        fromDatabase:
-          name: bb-burger-db
-          property: connectionString
+        value: "95316386376af7682b816ab7d9646c51"
       - key: PORT
         value: 8080
+      - key: DATABASE_URL
+        value: "postgresql://neondb_owner:endpoint=ep-green-flower-a41njh0k;npg_ZSfnwt30JeKI@ep-green-flower-a41njh0k-pooler.us-east-1.aws.neon.tech:5432/neondb?sslmode=require&serverVersion=15"
       
       - key: CLOUDINARY_CLOUD_NAME
-        sync: false
+        value: drqsusznh
       - key: CLOUDINARY_API_KEY
-        sync: false
+        value: "218493326687862"
       - key: CLOUDINARY_API_SECRET
-        sync: false
+        value: "modtkK3PoOOncmj0ACmnS1BfzZ8"
       - key: CLOUDINARY_URL
-        sync: false
-
-databases:
-  - name: bb-burger-db
-    databaseName: bb_burger
-    plan: free
+        value: "cloudinary://218493326687862:modtkK3PoOOncmj0ACmnS1BfzZ8@drqsusznh"
+      
+      - key: MESSENGER_TRANSPORT_DSN
+        value: "doctrine://default"
