@@ -7,7 +7,7 @@ services:
     branch: symfony
 
     dockerContextDir: BBurgerSymfony/BBurgerSymfony
-    dockerfilePath: Dockerfile
+    dockerfilePath: BBurgerSymfony/BBurgerSymfony/Dockerfile
 
     envVars:
       - key: APP_ENV
@@ -20,7 +20,7 @@ services:
         value: 8080
 
       - key: DATABASE_URL
-        sync: false
+        value: "postgresql://neondb_owner:npg_ZSfnwt30JeKI@ep-green-flower-a41njh0k-pooler.us-east-1.aws.neon.tech:5432/neondb?sslmode=require&serverVersion=15"
 
       - key: CLOUDINARY_CLOUD_NAME
         value: drqsusznh
