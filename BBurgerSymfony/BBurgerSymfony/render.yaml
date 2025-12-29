@@ -1,24 +1,11 @@
 services:
   - type: web
     name: bb-burger-gestionnaire
-    env: php
-    region: ohio
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    region: frankfurt
     plan: free
     branch: symfony
-    
-    buildCommand: |
-      # Mettre à jour Composer
-      composer self-update
-      # Installation production
-      composer install --no-dev --no-interaction --optimize-autoloader --no-scripts
-      # Scripts post-install
-      APP_ENV=prod php bin/console cache:clear --no-warmup
-      php bin/console assets:install public --env=prod --no-debug
-      APP_ENV=prod php bin/console cache:warmup
-    
-    startCommand: php -S 0.0.0.0:$PORT -t public
-    
-    healthCheckPath: /login
     
     envVars:
       - key: APP_ENV
@@ -29,6 +16,8 @@ services:
         fromDatabase:
           name: bb-burger-db
           property: connectionString
+      - key: PORT
+        value: 8080
       
       - key: CLOUDINARY_CLOUD_NAME
         sync: false
