@@ -1,0 +1,98 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Gestion des Burgers - BB.Resto{% endblock %}
+
+{% block body %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h3"><i class="bi bi-hamburger"></i> Gestion des Burgers</h1>
+    <a href="{{ path('gestionnaire_burger_new') }}" class="btn btn-primary">
+        <i class="bi bi-plus-circle"></i> Nouveau burger
+    </a>
+</div>
+
+
+<div class="card">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Image</th>
+                        <th>Nom</th>
+                        <th>Prix</th>
+                        <th>Type</th>
+                        <th>Calories</th>
+                        <th>Statut</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for burger in burgers %}
+                    <tr>
+                        <td>
+                            {% if burger.hasImage %}
+                                <img src="{{ burger.cloudinaryUrl }}" width="50" height="50" class="rounded">
+                            {% else %}
+                                <div class="bg-light rounded d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
+                                    <i class="bi bi-hamburger text-muted"></i>
+                                </div>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <strong>{{ burger.libelle }}</strong>
+                            {% if burger.description %}
+                                <br><small class="text-muted">{{ burger.description|slice(0, 50) }}...</small>
+                            {% endif %}
+                        </td>
+                        <td><strong>{{ burger.formattedPrix }}</strong></td>
+                        <td>{{ burger.typeBurger|default('N/A') }}</td>
+                        <td>{{ burger.calories|default('N/A') }}</td>
+                        <td>
+                            {% if burger.isArchived %}
+                                <span class="badge bg-danger">Archivé</span>
+                            {% else %}
+                                <span class="badge bg-success">Actif</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div class="btn-group">
+                                <a href="{{ path('gestionnaire_burger_edit', {id: burger.id}) }}" 
+                                   class="btn btn-sm btn-outline-primary">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                                
+                                {% if burger.isArchived %}
+                                    <form method="post" action="{{ path('gestionnaire_burger_restore', {id: burger.id}) }}" 
+                                          class="d-inline">
+                                        <input type="hidden" name="_token" value="{{ csrf_token('restore' ~ burger.id) }}">
+                                        <button type="submit" class="btn btn-sm btn-outline-success">
+                                            <i class="bi bi-arrow-clockwise"></i>
+                                        </button>
+                                    </form>
+                                {% else %}
+                                    <form method="post" action="{{ path('gestionnaire_burger_archive', {id: burger.id}) }}" 
+                                          class="d-inline" 
+                                          onsubmit="return confirm('Archiver ce burger ?')">
+                                        <input type="hidden" name="_token" value="{{ csrf_token('archive' ~ burger.id) }}">
+                                        <button type="submit" class="btn btn-sm btn-outline-warning">
+                                            <i class="bi bi-archive"></i>
+                                        </button>
+                                    </form>
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="7" class="text-center py-4">
+                            <i class="bi bi-hamburger display-6 text-muted"></i>
+                            <p class="mt-3 text-muted">Aucun burger trouvé</p>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

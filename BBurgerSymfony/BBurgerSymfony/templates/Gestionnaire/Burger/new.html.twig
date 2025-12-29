@@ -1,0 +1,75 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Nouveau Burger - BB.Resto{% endblock %}
+
+{% block body %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h1 class="h4 mb-0">
+                        <i class="bi bi-hamburger"></i> Créer un nouveau burger
+                    </h1>
+                </div>
+                <div class="card-body">
+                    {{ form_start(form, {'attr': {'class': 'needs-validation', 'novalidate': 'novalidate'}}) }}
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-8">
+                            {{ form_label(form.libelle, 'Nom du burger', {'label_attr': {'class': 'form-label'}}) }}
+                            {{ form_widget(form.libelle, {'attr': {'class': 'form-control', 'placeholder': 'Ex: Cheese Burger Deluxe'}}) }}
+                            <div class="invalid-feedback">
+                                Veuillez saisir un nom.
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            {{ form_label(form.prix, 'Prix (FCFA)', {'label_attr': {'class': 'form-label'}}) }}
+                            {{ form_widget(form.prix, {'attr': {'class': 'form-control', 'placeholder': '5000'}}) }}
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        {{ form_label(form.description, 'Description', {'label_attr': {'class': 'form-label'}}) }}
+                        {{ form_widget(form.description, {'attr': {'class': 'form-control', 'rows': 3, 'placeholder': 'Description détaillée du burger...'}}) }}
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            {{ form_label(form.typeBurger, 'Type', {'label_attr': {'class': 'form-label'}}) }}
+                            {{ form_widget(form.typeBurger, {'attr': {'class': 'form-control', 'placeholder': 'Ex: Classique, Poulet, Végétarien'}}) }}
+                        </div>
+                        <div class="col-md-4">
+                            {{ form_label(form.calories, 'Calories', {'label_attr': {'class': 'form-label'}}) }}
+                            {{ form_widget(form.calories, {'attr': {'class': 'form-control', 'placeholder': 'Ex: 650'}}) }}
+                        </div>
+                        <div class="col-md-4">
+                            {{ form_label(form.tempsPreparation, 'Temps (min)', {'label_attr': {'class': 'form-label'}}) }}
+                            {{ form_widget(form.tempsPreparation, {'attr': {'class': 'form-control', 'placeholder': 'Ex: 15'}}) }}
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        {{ form_label(form.imageFile, 'Image du burger', {'label_attr': {'class': 'form-label'}}) }}
+                        {{ form_widget(form.imageFile, {'attr': {'class': 'form-control'}}) }}
+                        <div class="form-text">
+                            Format accepté: JPG, PNG. Taille max: 2MB.
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-between mt-4">
+                        <a href="{{ path('gestionnaire_burger_index') }}" class="btn btn-secondary">
+                            <i class="bi bi-arrow-left"></i> Retour à la liste
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-check-circle"></i> Créer le burger
+                        </button>
+                    </div>
+                    
+                    {{ form_end(form) }}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

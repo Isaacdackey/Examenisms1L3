@@ -1,0 +1,78 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Modifier {{ burger.libelle }} - BB.Resto{% endblock %}
+
+{% block body %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header bg-info text-white">
+                    <h1 class="h4 mb-0">
+                        <i class="bi bi-pencil"></i> Modifier le burger
+                    </h1>
+                </div>
+                <div class="card-body">
+                    {{ form_start(form, {'attr': {'class': 'needs-validation', 'novalidate': 'novalidate'}}) }}
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-8">
+                            {{ form_label(form.libelle, 'Nom du burger', {'label_attr': {'class': 'form-label'}}) }}
+                            {{ form_widget(form.libelle, {'attr': {'class': 'form-control'}}) }}
+                        </div>
+                        <div class="col-md-4">
+                            {{ form_label(form.prix, 'Prix (FCFA)', {'label_attr': {'class': 'form-label'}}) }}
+                            {{ form_widget(form.prix, {'attr': {'class': 'form-control'}}) }}
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        {{ form_label(form.description, 'Description', {'label_attr': {'class': 'form-label'}}) }}
+                        {{ form_widget(form.description, {'attr': {'class': 'form-control', 'rows': 3}}) }}
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            {{ form_label(form.typeBurger, 'Type', {'label_attr': {'class': 'form-label'}}) }}
+                            {{ form_widget(form.typeBurger, {'attr': {'class': 'form-control'}}) }}
+                        </div>
+                        <div class="col-md-4">
+                            {{ form_label(form.calories, 'Calories', {'label_attr': {'class': 'form-label'}}) }}
+                            {{ form_widget(form.calories, {'attr': {'class': 'form-control'}}) }}
+                        </div>
+                        <div class="col-md-4">
+                            {{ form_label(form.tempsPreparation, 'Temps (min)', {'label_attr': {'class': 'form-label'}}) }}
+                            {{ form_widget(form.tempsPreparation, {'attr': {'class': 'form-control'}}) }}
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        {% if burger.hasImage %}
+                            <div class="mb-2">
+                                <img src="{{ burger.cloudinaryUrl }}" class="img-thumbnail" width="150">
+                                <div class="form-text mt-1">Image actuelle</div>
+                            </div>
+                        {% endif %}
+                        {{ form_label(form.imageFile, 'Nouvelle image', {'label_attr': {'class': 'form-label'}}) }}
+                        {{ form_widget(form.imageFile, {'attr': {'class': 'form-control'}}) }}
+                        <div class="form-text">
+                            Laisser vide pour conserver l'image actuelle.
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-between mt-4">
+                        <a href="{{ path('gestionnaire_burger_index') }}" class="btn btn-secondary">
+                            <i class="bi bi-arrow-left"></i> Annuler
+                        </a>
+                        <button type="submit" class="btn btn-success">
+                            <i class="bi bi-save"></i> Enregistrer les modifications
+                        </button>
+                    </div>
+                    
+                    {{ form_end(form) }}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

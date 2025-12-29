@@ -1,0 +1,90 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Détails du Burger - {{ burger.libelle }}{% endblock %}
+
+{% block body %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                    <h1 class="h4 mb-0">
+                        <i class="bi bi-hamburger"></i> {{ burger.libelle }}
+                    </h1>
+                    <span class="badge bg-light text-dark">{{ burger.formattedPrix }}</span>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-4">
+                            {% if burger.hasImage %}
+                                <img src="{{ burger.cloudinaryUrl }}" class="img-fluid rounded" alt="{{ burger.libelle }}">
+                            {% else %}
+                                <div class="bg-light rounded d-flex align-items-center justify-content-center" style="height: 200px;">
+                                    <i class="bi bi-hamburger text-muted" style="font-size: 4rem;"></i>
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-8">
+                            <h5>Description</h5>
+                            <p>{{ burger.description|default('Aucune description') }}</p>
+                            
+                            <div class="row mt-4">
+                                <div class="col-md-6">
+                                    <h6><i class="bi bi-info-circle"></i> Informations</h6>
+                                    <ul class="list-unstyled">
+                                        <li><strong>Type :</strong> {{ burger.typeBurger|default('N/A') }}</li>
+                                        <li><strong>Calories :</strong> {{ burger.calories|default('N/A') }}</li>
+                                        <li><strong>Temps de préparation :</strong> {{ burger.tempsPreparation|default('N/A') }} min</li>
+                                        <li><strong>Statut :</strong> 
+                                            {% if burger.isArchived %}
+                                                <span class="badge bg-danger">Archivé</span>
+                                            {% else %}
+                                                <span class="badge bg-success">Actif</span>
+                                            {% endif %}
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div class="col-md-6">
+                                    <h6><i class="bi bi-calendar"></i> Dates</h6>
+                                    <ul class="list-unstyled">
+                                        <li><strong>Créé le :</strong> {{ burger.createdAt|date('d/m/Y H:i') }}</li>
+                                        <li><strong>Modifié le :</strong> {{ burger.updatedAt ? burger.updatedAt|date('d/m/Y H:i') : 'Jamais' }}</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <div class="d-flex justify-content-between">
+                        <a href="{{ path('gestionnaire_burger_index') }}" class="btn btn-secondary">
+                            <i class="bi bi-arrow-left"></i> Retour à la liste
+                        </a>
+                        <div class="btn-group">
+                            <a href="{{ path('gestionnaire_burger_edit', {'id': burger.id}) }}" class="btn btn-primary">
+                                <i class="bi bi-pencil"></i> Modifier
+                            </a>
+                            {% if burger.isArchived %}
+                                <form method="post" action="{{ path('gestionnaire_burger_restore', {'id': burger.id}) }}" class="d-inline">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('restore' ~ burger.id) }}">
+                                    <button type="submit" class="btn btn-success">
+                                        <i class="bi bi-arrow-clockwise"></i> Restaurer
+                                    </button>
+                                </form>
+                            {% else %}
+                                <form method="post" action="{{ path('gestionnaire_burger_archive', {'id': burger.id}) }}" 
+                                      class="d-inline" onsubmit="return confirm('Archiver ce burger ?')">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('archive' ~ burger.id) }}">
+                                    <button type="submit" class="btn btn-warning">
+                                        <i class="bi bi-archive"></i> Archiver
+                                    </button>
+                                </form>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
