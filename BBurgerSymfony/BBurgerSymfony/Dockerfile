@@ -11,7 +11,7 @@ RUN apt-get update && apt-get install -y \
     git \
     curl \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
-    && docker-php-ext-install -j$(nproc) gd pdo pdo_mysql zip
+    && docker-php-ext-install -j$(nproc) gd pdo pdo_mysql zip pdo_pgsql
 
 
 RUN a2enmod rewrite
@@ -28,8 +28,9 @@ WORKDIR /var/www/html
 RUN composer install --no-dev --optimize-autoloader --no-interaction
 
 
-RUN echo 'Listen ${PORT}' > /etc/apache2/ports.conf
-RUN sed -i 's/80/${PORT}/g' /etc/apache2/sites-available/000-default.conf /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf
+RUN echo 'Listen 8080' > /etc/apache2/ports.conf
+RUN sed -i 's/Listen 80/Listen 8080/g' /etc/apache2/ports.conf
+RUN sed -i 's/:80/:8080/g' /etc/apache2/sites-available/*.conf
 
 
 RUN chown -R www-data:www-data /var/www/html/var

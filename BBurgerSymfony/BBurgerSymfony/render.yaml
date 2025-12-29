@@ -2,7 +2,8 @@ services:
   - type: web
     name: bb-burger-gestionnaire
     runtime: docker
-    dockerContextDir: ./BBBurgerSymfony/BBBurgerSymfony
+    rootDir: ./BBBurgerSymfony/BBBurgerSymfony
+    dockerContextDir: .
     dockerfilePath: ./BBBurgerSymfony/BBBurgerSymfony/Dockerfile
     region: frankfurt
     plan: free
@@ -12,7 +13,7 @@ services:
       - key: APP_ENV
         value: prod
       - key: APP_SECRET
-        value: "95316386376af7682b816ab7d9646c51"
+        generateValue: true
       - key: PORT
         value: 8080
       - key: DATABASE_URL
@@ -23,9 +24,9 @@ services:
       - key: CLOUDINARY_API_KEY
         value: "218493326687862"
       - key: CLOUDINARY_API_SECRET
-        value: "modtkK3PoOOncmj0ACmnS1BfzZ8"
+        sync: false
       - key: CLOUDINARY_URL
-        value: "cloudinary://218493326687862:modtkK3PoOOncmj0ACmnS1BfzZ8@drqsusznh"
+        sync: false
       
       - key: MESSENGER_TRANSPORT_DSN
         value: "doctrine://default"
