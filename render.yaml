@@ -6,9 +6,11 @@ services:
     plan: free
     branch: symfony
 
+    
     dockerContextDir: BBurgerSymfony/BBurgerSymfony
-    dockerfilePath: BBurgerSymfony/BBurgerSymfony/Dockerfile
+    dockerfilePath: ./Dockerfile
 
+    
     envVars:
       - key: APP_ENV
         value: prod
@@ -19,8 +21,9 @@ services:
       - key: PORT
         value: 8080
 
+      
       - key: DATABASE_URL
-        value: "postgresql://neondb_owner:npg_ZSfnwt30JeKI@ep-green-flower-a41njh0k-pooler.us-east-1.aws.neon.tech:5432/neondb?sslmode=require&serverVersion=15"
+        value: "postgresql://neondb_owner:endpoint=ep-green-flower-a41njh0k;npg_ZSfnwt30JeKI@ep-green-flower-a41njh0k-pooler.us-east-1.aws.neon.tech:5432/neondb?sslmode=require&serverVersion=15"
 
       - key: CLOUDINARY_CLOUD_NAME
         value: drqsusznh
@@ -30,9 +33,11 @@ services:
 
       - key: CLOUDINARY_API_SECRET
         sync: false
+        value: "modtkK3PoOOncmj0ACmnS1BfzZ8"
 
       - key: CLOUDINARY_URL
         sync: false
+        value: "cloudinary://218493326687862:modtkK3PoOOncmj0ACmnS1BfzZ8@drqsusznh"
 
       - key: MESSENGER_TRANSPORT_DSN
         value: "doctrine://default"
