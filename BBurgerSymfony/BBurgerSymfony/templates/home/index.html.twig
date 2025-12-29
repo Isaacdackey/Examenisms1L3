@@ -1,0 +1,31 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}B-Burger - Accueil{% endblock %}
+
+{% block body %}
+<div class="container mt-5">
+    <div class="jumbotron text-center">
+        <h1 class="display-4">Bienvenue chez B-Burger !</h1>
+        <p class="lead">Votre restaurant de burgers préféré</p>
+        <hr class="my-4">
+        
+        {% if app.user %}
+            <h3>Bonjour {{ app.user.getFullName() }} !</h3>
+            <p class="lead">
+                {% if 'ROLE_GESTIONNAIRE' in app.user.roles %}
+                    Vous êtes connecté en tant que <strong>Gestionnaire</strong>
+                    <a href="{{ path('gestionnaire_dashboard') }}" class="btn btn-primary btn-lg mt-3">
+                        Accéder au tableau de bord
+                    </a>
+                {% endif %}
+            </p>
+        {% else %}
+            <p class="lead">
+                <a href="{{ path('app_login') }}" class="btn btn-primary btn-lg">
+                    Se connecter
+                </a>
+            </p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
