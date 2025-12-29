@@ -2,13 +2,14 @@ services:
   - type: web
     name: bb-burger-gestionnaire
     runtime: docker
-    rootDir: ./BBBurgerSymfony/BBBurgerSymfony
-    dockerContextDir: ./BBBurgerSymfony/BBBurgerSymfony
-    dockerfilePath: ./Dockerfile  
     region: frankfurt
     plan: free
     branch: symfony
-    
+
+    rootDir: .
+    dockerContextDir: .
+    dockerfilePath: Dockerfile
+
     envVars:
       - key: APP_ENV
         value: prod
@@ -17,8 +18,7 @@ services:
       - key: PORT
         value: 8080
       - key: DATABASE_URL
-        value: "postgresql://neondb_owner:endpoint=ep-green-flower-a41njh0k;npg_ZSfnwt30JeKI@ep-green-flower-a41njh0k-pooler.us-east-1.aws.neon.tech:5432/neondb?sslmode=require&serverVersion=15"
-      
+        value: "postgresql://neondb_owner:…?sslmode=require&serverVersion=15"
       - key: CLOUDINARY_CLOUD_NAME
         value: drqsusznh
       - key: CLOUDINARY_API_KEY
@@ -27,6 +27,5 @@ services:
         sync: false
       - key: CLOUDINARY_URL
         sync: false
-      
       - key: MESSENGER_TRANSPORT_DSN
         value: "doctrine://default"
