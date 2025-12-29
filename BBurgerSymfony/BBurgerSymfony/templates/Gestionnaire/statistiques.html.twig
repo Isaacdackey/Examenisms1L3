@@ -1,0 +1,433 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Statistiques - BB.Resto{% endblock %}
+
+{% block body %}
+{% set today = today|default('now'|date('d/m/Y')) %}
+{% set produitsPlusVendus = produitsPlusVendus|default([]) %}
+{% set commandesParStatut = commandesParStatut|default([]) %}
+{% set commandesParTypeRetrait = commandesParTypeRetrait|default([]) %}
+{% set commandesParLivreur = commandesParLivreur|default([]) %}
+{% set burgersPlusVendus = burgersPlusVendus|default([]) %}
+{% set menusPlusVendus = menusPlusVendus|default([]) %}
+{% set totalCommandes = totalCommandes|default(0) %}
+{% set recetteTotale = recetteTotale|default(0) %}
+{% set commandesAnnuleesAujourdhui = commandesAnnuleesAujourdhui|default(0) %}
+
+<h1 class="h3 mb-4"><i class="bi bi-graph-up"></i> Statistiques</h1>
+
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card text-white bg-primary">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="card-title">Total commandes</h6>
+                        <h2 class="mb-0">{{ totalCommandes }}</h2>
+                    </div>
+                    <i class="bi bi-cart" style="font-size: 2rem;"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="card text-white bg-success">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="card-title">Recette totale</h6>
+                        <h2 class="mb-0">{{ recetteTotale|number_format(0, ',', ' ') }} FCFA</h2>
+                    </div>
+                    <i class="bi bi-cash-stack" style="font-size: 2rem;"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="card text-white bg-info">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="card-title">Date</h6>
+                        <h5 class="mb-0">{{ today|date('d/m/Y') }}</h5>
+                    </div>
+                    <i class="bi bi-calendar" style="font-size: 2rem;"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="card text-white bg-warning">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="card-title">Annulées</h6>
+                        <h2 class="mb-0">{{ commandesAnnuleesAujourdhui }}</h2>
+                    </div>
+                    <i class="bi bi-x-circle" style="font-size: 2rem;"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    
+    <div class="col-md-6 mb-4">
+        <div class="card">
+            <div class="card-header bg-transparent d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="bi bi-trophy"></i> Top 10 produits vendus</h5>
+                <span class="badge bg-primary">Aujourd'hui</span>
+            </div>
+            <div class="card-body">
+                {% if produitsPlusVendus is empty %}
+                    <div class="text-center py-4">
+                        <i class="bi bi-emoji-frown display-4 text-muted"></i>
+                        <p class="mt-3 text-muted">Aucune vente aujourd'hui.</p>
+                    </div>
+                {% else %}
+                    <div class="table-responsive">
+                        <table class="table table-sm table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th width="50">#</th>
+                                    <th>Produit</th>
+                                    <th>Type</th>
+                                    <th class="text-end">Quantité</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for index, produit in produitsPlusVendus %}
+                                <tr>
+                                    <td>
+                                        {% if index == 0 %}
+                                            <span class="badge bg-warning text-dark fw-bold">1</span>
+                                        {% elseif index == 1 %}
+                                            <span class="badge bg-secondary fw-bold">2</span>
+                                        {% elseif index == 2 %}
+                                            <span class="badge bg-danger fw-bold">3</span>
+                                        {% else %}
+                                            <span class="text-muted">{{ index + 1 }}</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <strong>{{ produit.libelle }}</strong>
+                                    </td>
+                                    <td>
+                                        <span class="badge 
+                                            {% if produit.type == 'Burger' %}bg-primary
+                                            {% elseif produit.type == 'Menu' %}bg-success
+                                            {% else %}bg-info{% endif %}">
+                                            {{ produit.type }}
+                                        </span>
+                                    </td>
+                                    <td class="text-end">
+                                        <span class="badge bg-dark rounded-pill px-3">{{ produit.total }}</span>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    
+    <div class="col-md-6 mb-4">
+        <div class="card">
+            <div class="card-header bg-transparent">
+                <h5 class="mb-0"><i class="bi bi-pie-chart"></i> Répartition par statut</h5>
+            </div>
+            <div class="card-body">
+                {% if commandesParStatut is empty %}
+                    <div class="text-center py-4">
+                        <i class="bi bi-emoji-frown display-4 text-muted"></i>
+                        <p class="mt-3 text-muted">Aucune commande aujourd'hui.</p>
+                    </div>
+                {% else %}
+                    <div class="table-responsive">
+                        <table class="table table-sm">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Statut</th>
+                                    <th class="text-end">Nombre</th>
+                                    <th class="text-end">%</th>
+                                    <th>Graphique</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for stat in commandesParStatut %}
+                                {% set pourcentage = totalCommandes > 0 ? (stat.count / totalCommandes * 100)|round(1) : 0 %}
+                                <tr>
+                                    <td>
+                                        <span class="badge badge-status 
+                                            {% if stat.statut == 'EN_ATTENTE' %}bg-warning text-dark
+                                            {% elseif stat.statut == 'VALIDEE' %}bg-info
+                                            {% elseif stat.statut == 'EN_PREPARATION' %}bg-primary
+                                            {% elseif stat.statut == 'PRETE' %}bg-success
+                                            {% elseif stat.statut == 'EN_LIVRAISON' %}bg-dark
+                                            {% elseif stat.statut == 'LIVREE' %}bg-success
+                                            {% elseif stat.statut == 'TERMINEE' %}bg-secondary
+                                            {% elseif stat.statut == 'ANNULEE' %}bg-danger
+                                            {% endif %}">
+                                            {{ stat.statut|replace({'_': ' '})|title }}
+                                        </span>
+                                    </td>
+                                    <td class="text-end">
+                                        <strong>{{ stat.count }}</strong>
+                                    </td>
+                                    <td class="text-end">
+                                        <strong>{{ pourcentage }}%</strong>
+                                    </td>
+                                    <td>
+                                        <div class="progress" style="height: 8px;">
+                                            <div class="progress-bar 
+                                                {% if stat.statut == 'EN_ATTENTE' %}bg-warning
+                                                {% elseif stat.statut == 'VALIDEE' %}bg-info
+                                                {% elseif stat.statut == 'EN_PREPARATION' %}bg-primary
+                                                {% elseif stat.statut == 'PRETE' %}bg-success
+                                                {% elseif stat.statut == 'EN_LIVRAISON' %}bg-dark
+                                                {% elseif stat.statut == 'LIVREE' %}bg-success
+                                                {% elseif stat.statut == 'TERMINEE' %}bg-secondary
+                                                {% elseif stat.statut == 'ANNULEE' %}bg-danger
+                                                {% endif %}" 
+                                                style="width: {{ pourcentage }}%">
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-4 mb-4">
+        <div class="card">
+            <div class="card-header bg-transparent">
+                <h5 class="mb-0"><i class="bi bi-hamburger"></i> Top burgers</h5>
+            </div>
+            <div class="card-body">
+                {% if burgersPlusVendus is empty %}
+                    <div class="text-center py-3">
+                        <i class="bi bi-hamburger text-muted" style="font-size: 2rem;"></i>
+                        <p class="mt-2 text-muted">Aucun burger vendu aujourd'hui.</p>
+                    </div>
+                {% else %}
+                    <ul class="list-group list-group-flush">
+                        {% for burger in burgersPlusVendus %}
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <span>{{ burger.libelle }}</span>
+                            <span class="badge bg-primary rounded-pill">{{ burger.total }}</span>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4 mb-4">
+        <div class="card">
+            <div class="card-header bg-transparent">
+                <h5 class="mb-0"><i class="bi bi-cup-straw"></i> Top menus</h5>
+            </div>
+            <div class="card-body">
+                {% if menusPlusVendus is empty %}
+                    <div class="text-center py-3">
+                        <i class="bi bi-cup-straw text-muted" style="font-size: 2rem;"></i>
+                        <p class="mt-2 text-muted">Aucun menu vendu aujourd'hui.</p>
+                    </div>
+                {% else %}
+                    <ul class="list-group list-group-flush">
+                        {% for menu in menusPlusVendus %}
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <span>{{ menu.libelle }}</span>
+                            <span class="badge bg-success rounded-pill">{{ menu.total }}</span>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4 mb-4">
+        <div class="card">
+            <div class="card-header bg-transparent">
+                <h5 class="mb-0"><i class="bi bi-cup-hot"></i> Top compléments</h5>
+            </div>
+            <div class="card-body">
+                {% set complements = produitsPlusVendus|filter(p => p.type == 'Complément') %}
+                {% if complements is empty %}
+                    <div class="text-center py-3">
+                        <i class="bi bi-cup-hot text-muted" style="font-size: 2rem;"></i>
+                        <p class="mt-2 text-muted">Aucun complément vendu aujourd'hui.</p>
+                    </div>
+                {% else %}
+                    <ul class="list-group list-group-flush">
+                        {% for complement in complements|slice(0, 5) %}
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <span>{{ complement.libelle }}</span>
+                            <span class="badge bg-info rounded-pill">{{ complement.total }}</span>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6 mb-4">
+        <div class="card">
+            <div class="card-header bg-transparent">
+                <h5 class="mb-0"><i class="bi bi-truck"></i> Répartition par type de retrait</h5>
+            </div>
+            <div class="card-body">
+                {% if commandesParTypeRetrait is empty %}
+                    <p class="text-muted">Aucune donnée disponible.</p>
+                {% else %}
+                    <div class="table-responsive">
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Type</th>
+                                    <th class="text-end">Nombre</th>
+                                    <th class="text-end">Total (FCFA)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for type in commandesParTypeRetrait %}
+                                <tr>
+                                    <td>
+                                        {% if type.typeRetrait == 'LIVRAISON' %}
+                                            <i class="bi bi-truck text-primary"></i> Livraison
+                                        {% elseif type.typeRetrait == 'A_EMPORTER' %}
+                                            <i class="bi bi-bag text-success"></i> À emporter
+                                        {% else %}
+                                            <i class="bi bi-shop text-info"></i> Sur place
+                                        {% endif %}
+                                    </td>
+                                    <td class="text-end">{{ type.count }}</td>
+                                    <td class="text-end">{{ (type.total|default(0))|number_format(0, ',', ' ') }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 mb-4">
+        <div class="card">
+            <div class="card-header bg-transparent">
+                <h5 class="mb-0"><i class="bi bi-person-badge"></i> Top livreurs</h5>
+            </div>
+            <div class="card-body">
+                {% if commandesParLivreur is empty %}
+                    <div class="text-center py-4">
+                        <i class="bi bi-truck text-muted" style="font-size: 2rem;"></i>
+                        <p class="mt-2 text-muted">Aucune livraison aujourd'hui.</p>
+                    </div>
+                {% else %}
+                    <div class="table-responsive">
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Livreur</th>
+                                    <th class="text-end">Commandes</th>
+                                    <th class="text-end">Total livré</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for livreur in commandesParLivreur %}
+                                <tr>
+                                    <td>
+                                        <i class="bi bi-person-circle"></i> 
+                                        {{ livreur.prenom }} {{ livreur.nom }}
+                                    </td>
+                                    <td class="text-end">
+                                        <span class="badge bg-primary rounded-pill">{{ livreur.nbCommandes }}</span>
+                                    </td>
+                                    <td class="text-end">{{ (livreur.totalLivraisons|default(0))|number_format(0, ',', ' ') }} FCFA</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header bg-transparent">
+                <h5 class="mb-0"><i class="bi bi-bar-chart"></i> Résumé des ventes du jour</h5>
+            </div>
+            <div class="card-body">
+                <div class="row text-center">
+                    <div class="col-md-4 mb-3">
+                        <div class="p-3 border rounded">
+                            <h5 class="text-primary">{{ totalCommandes }}</h5>
+                            <p class="text-muted mb-0">Commandes totales</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <div class="p-3 border rounded">
+                            <h5 class="text-success">{{ recetteTotale|number_format(0, ',', ' ') }} FCFA</h5>
+                            <p class="text-muted mb-0">Chiffre d'affaires</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <div class="p-3 border rounded">
+                            <h5 class="text-warning">{{ commandesAnnuleesAujourdhui }}</h5>
+                            <p class="text-muted mb-0">Commandes annulées</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="alert alert-info mt-3">
+                    <i class="bi bi-info-circle"></i> 
+                    <strong>Note :</strong> Les statistiques sont calculées sur les commandes du 
+                    <strong>{{ today|date('d/m/Y') }}</strong>. 
+                    Les produits vendus incluent burgers, menus et compléments.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+{{ parent() }}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const progressBars = document.querySelectorAll('.progress-bar');
+        progressBars.forEach(bar => {
+            const width = bar.style.width;
+            bar.style.width = '0%';
+            setTimeout(() => {
+                bar.style.width = width;
+                bar.style.transition = 'width 1.5s ease-in-out';
+            }, 200);
+        });
+    });
+</script>
+{% endblock %}

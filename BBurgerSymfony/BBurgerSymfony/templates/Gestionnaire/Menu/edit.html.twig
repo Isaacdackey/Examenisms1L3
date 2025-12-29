@@ -1,0 +1,107 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Modifier {{ menu.libelle }} - BB.Resto{% endblock %}
+
+{% block body %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-10">
+            <div class="card">
+                <div class="card-header bg-info text-white">
+                    <h1 class="h4 mb-0">
+                        <i class="bi bi-pencil"></i> Modifier le menu
+                    </h1>
+                </div>
+                <div class="card-body">
+                    {{ form_start(form, {'attr': {'class': 'needs-validation', 'novalidate': 'novalidate'}}) }}
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-8">
+                            {{ form_label(form.libelle, 'Nom du menu', {'label_attr': {'class': 'form-label'}}) }}
+                            {{ form_widget(form.libelle, {'attr': {'class': 'form-control'}}) }}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Prix actuel</label>
+                            <div class="alert alert-warning">
+                                <strong>{{ menu.prix|number_format(0, ',', ' ') }} FCFA</strong>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        {{ form_label(form.description, 'Description', {'label_attr': {'class': 'form-label'}}) }}
+                        {{ form_widget(form.description, {'attr': {'class': 'form-control', 'rows': 3}}) }}
+                    </div>
+
+                    <h5 class="border-bottom pb-2 mb-3"><i class="bi bi-list-check"></i> Composition du menu</h5>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            {{ form_label(form.burger, 'Burger principal', {'label_attr': {'class': 'form-label'}}) }}
+                            {{ form_widget(form.burger, {'attr': {'class': 'form-control'}}) }}
+                            <small class="text-muted">
+                                Prix: {{ menu.burger ? menu.burger.prix|number_format(0, ',', ' ') : '0' }} FCFA
+                            </small>
+                        </div>
+                        <div class="col-md-4">
+                            {{ form_label(form.boisson, 'Boisson', {'label_attr': {'class': 'form-label'}}) }}
+                            {{ form_widget(form.boisson, {'attr': {'class': 'form-control'}}) }}
+                            <small class="text-muted">
+                                Prix: {{ menu.boisson ? menu.boisson.prix|number_format(0, ',', ' ') : '0' }} FCFA
+                            </small>
+                        </div>
+                        <div class="col-md-4">
+                            {{ form_label(form.frites, 'Frites', {'label_attr': {'class': 'form-label'}}) }}
+                            {{ form_widget(form.frites, {'attr': {'class': 'form-control'}}) }}
+                            <small class="text-muted">
+                                Prix: {{ menu.frites ? menu.frites.prix|number_format(0, ',', ' ') : '0' }} FCFA
+                            </small>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        {% if menu.cloudinaryUrl %}
+                            <div class="mb-2">
+                                <img src="{{ menu.cloudinaryUrl }}" class="img-thumbnail" width="150">
+                                <div class="form-text mt-1">Image actuelle</div>
+                            </div>
+                        {% endif %}
+                        {{ form_label(form.imageFile, 'Nouvelle image', {'label_attr': {'class': 'form-label'}}) }}
+                        {{ form_widget(form.imageFile, {'attr': {'class': 'form-control'}}) }}
+                        <div class="form-text">
+                            Laisser vide pour conserver l'image actuelle.
+                        </div>
+                    </div>
+
+                    <div class="alert alert-info">
+                        <i class="bi bi-calculator"></i> Prix recalculé automatiquement : 
+                        <strong>
+                            {% set totalComponents = 
+                                (menu.burger ? menu.burger.prix : 0) + 
+                                (menu.boisson ? menu.boisson.prix : 0) + 
+                                (menu.frites ? menu.frites.prix : 0) 
+                            %}
+                            {% set prixAvecPromotion = totalComponents * (1 - (menu.promotion|default(10)) / 100) %}
+                            {{ prixAvecPromotion|round|number_format(0, ',', ' ') }}
+                        </strong> 
+                        FCFA avec promotion de <strong>{{ menu.promotion|default(10) }}%</strong>
+                        <br>
+                        <small>(Total composants: {{ totalComponents|number_format(0, ',', ' ') }} FCFA)</small>
+                    </div>
+
+                    <div class="d-flex justify-content-between mt-4">
+                        <a href="{{ path('gestionnaire_menu_index') }}" class="btn btn-secondary">
+                            <i class="bi bi-arrow-left"></i> Annuler
+                        </a>
+                        <button type="submit" class="btn btn-success">
+                            <i class="bi bi-save"></i> Enregistrer les modifications
+                        </button>
+                    </div>
+                    
+                    {{ form_end(form) }}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

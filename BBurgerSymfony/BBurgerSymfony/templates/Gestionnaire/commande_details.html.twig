@@ -1,0 +1,246 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Commande {{ commande.numero }} - BB.Resto{% endblock %}
+
+{% block body %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h3">
+        <i class="bi bi-receipt"></i> Commande {{ commande.numero }}
+    </h1>
+    <a href="{{ path('gestionnaire_commandes') }}" class="btn btn-secondary">
+        <i class="bi bi-arrow-left"></i> Retour
+    </a>
+</div>
+
+<div class="row">
+    
+    <div class="col-md-8">
+        <div class="card mb-4">
+            <div class="card-header bg-transparent">
+                <h5 class="mb-0"><i class="bi bi-info-circle"></i> Informations de la commande</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><strong>Numéro :</strong> {{ commande.numero }}</p>
+                        <p><strong>Date :</strong> {{ commande.createdAt|date('d/m/Y à H:i') }}</p>
+                        <p>
+                            <strong>Statut :</strong> 
+                            <span class="badge badge-status 
+                                {% if commande.statut == 'EN_ATTENTE' %}bg-warning text-dark
+                                {% elseif commande.statut == 'VALIDEE' %}bg-info
+                                {% elseif commande.statut == 'EN_PREPARATION' %}bg-primary
+                                {% elseif commande.statut == 'PRETE' %}bg-success
+                                {% elseif commande.statut == 'EN_LIVRAISON' %}bg-dark
+                                {% elseif commande.statut == 'LIVREE' %}bg-success
+                                {% elseif commande.statut == 'TERMINEE' %}bg-secondary
+                                {% elseif commande.statut == 'ANNULEE' %}bg-danger
+                                {% endif %}">
+                                {{ commande.statutLabel }}
+                            </span>
+                        </p>
+                    </div>
+                    <div class="col-md-6">
+                        <p>
+                            <strong>Type de retrait :</strong> 
+                            {% if commande.typeRetrait == 'LIVRAISON' %}
+                                <i class="bi bi-truck"></i> Livraison
+                            {% elseif commande.typeRetrait == 'A_EMPORTER' %}
+                                <i class="bi bi-bag"></i> À emporter
+                            {% else %}
+                                <i class="bi bi-shop"></i> Sur place
+                            {% endif %}
+                        </p>
+                        <p><strong>Adresse :</strong> {{ commande.adresse }}</p>
+                        {% if commande.zone %}
+                            <p><strong>Zone :</strong> {{ commande.zone.nom }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                {% if commande.notes %}
+                    <div class="alert alert-warning mt-3">
+                        <strong><i class="bi bi-sticky"></i> Notes :</strong> {{ commande.notes }}
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        
+        <div class="card mb-4">
+            <div class="card-header bg-transparent">
+                <h5 class="mb-0"><i class="bi bi-bag-check"></i> Produits commandés</h5>
+            </div>
+            <div class="card-body">
+                {% if commande.lignesCommande is empty %}
+                    <p class="text-muted">Aucun produit dans cette commande.</p>
+                {% else %}
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Produit</th>
+                                    <th class="text-center">Quantité</th>
+                                    <th class="text-end">Prix unitaire</th>
+                                    <th class="text-end">Sous-total</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for ligne in commande.lignesCommande %}
+                                <tr>
+                                    <td>
+                                        <strong>{{ ligne.produit.libelle }}</strong>
+                                        {% if ligne.produit.description %}
+                                            <br>
+                                            <small class="text-muted">{{ ligne.produit.description }}</small>
+                                        {% endif %}
+                                    </td>
+                                    <td class="text-center">
+                                        <span class="badge bg-primary">{{ ligne.quantite }}</span>
+                                    </td>
+                                    <td class="text-end">{{ ligne.produit.formattedPrix }}</td>
+                                    <td class="text-end"><strong>{{ ligne.formattedSousTotal }}</strong></td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                            <tfoot>
+                                <tr class="table-active">
+                                    <td colspan="3" class="text-end"><strong>TOTAL</strong></td>
+                                    <td class="text-end">
+                                        <h5 class="mb-0 text-primary">{{ commande.formattedMontant }}</h5>
+                                    </td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+
+    <div class="col-md-4">
+        <div class="card mb-4">
+            <div class="card-header bg-transparent">
+                <h5 class="mb-0"><i class="bi bi-person"></i> Client</h5>
+            </div>
+            <div class="card-body">
+                <h6>{{ commande.user.fullName }}</h6>
+                <p class="mb-1">
+                    <i class="bi bi-envelope"></i> {{ commande.user.email }}
+                </p>
+                <p class="mb-1">
+                    <i class="bi bi-telephone"></i> {{ commande.user.tel }}
+                </p>
+                {% if commande.user.adresse %}
+                    <p class="mb-0">
+                        <i class="bi bi-geo-alt"></i> {{ commande.user.adresse }}
+                    </p>
+                {% endif %}
+            </div>
+        </div>
+
+
+        <div class="card mb-4">
+            <div class="card-header bg-transparent">
+                <h5 class="mb-0"><i class="bi bi-lightning"></i> Actions rapides</h5>
+            </div>
+            <div class="card-body">
+                {% if commande.statut == 'EN_ATTENTE' %}
+                    <form method="post" action="{{ path('gestionnaire_commande_valider', {id: commande.id}) }}" 
+                          class="d-grid gap-2 mb-2" onsubmit="return confirm('Valider cette commande ?')">
+                        <button type="submit" class="btn btn-success">
+                            <i class="bi bi-check-circle"></i> Valider
+                        </button>
+                    </form>
+                {% endif %}
+                
+                {% if commande.statut in ['VALIDEE', 'EN_PREPARATION'] %}
+                    <form method="post" action="{{ path('gestionnaire_commande_prete', {id: commande.id}) }}" 
+                          class="d-grid gap-2 mb-2" onsubmit="return confirm('Marquer comme prête ?')">
+                        <button type="submit" class="btn btn-info">
+                            <i class="bi bi-box-seam"></i> Marquer prête
+                        </button>
+                    </form>
+                {% endif %}
+                
+                {% if commande.statut in ['EN_ATTENTE', 'VALIDEE'] %}
+                    <button type="button" class="btn btn-danger w-100" 
+                            data-bs-toggle="modal" data-bs-target="#modalAnnuler">
+                        <i class="bi bi-x-circle"></i> Annuler
+                    </button>
+                {% endif %}
+            </div>
+        </div>
+
+        
+        {% if commande.statut == 'PRETE' and commande.typeRetrait == 'LIVRAISON' %}
+        <div class="card">
+            <div class="card-header bg-transparent">
+                <h5 class="mb-0"><i class="bi bi-truck"></i> Assigner un livreur</h5>
+            </div>
+            <div class="card-body">
+                <form method="post" action="{{ path('gestionnaire_commande_assigner_livreur', {id: commande.id}) }}">
+                    <div class="mb-3">
+                        <label class="form-label">Choisir un livreur</label>
+                        <select name="livreur_id" class="form-select" required>
+                            <option value="">Sélectionner...</option>
+                            {# Note: Vous devrez passer la liste des livreurs depuis le contrôleur #}
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="bi bi-person-check"></i> Assigner
+                    </button>
+                </form>
+            </div>
+        </div>
+        {% endif %}
+
+        
+        {% if commande.livreur %}
+        <div class="card">
+            <div class="card-header bg-transparent">
+                <h5 class="mb-0"><i class="bi bi-person-badge"></i> Livreur</h5>
+            </div>
+            <div class="card-body">
+                <h6>{{ commande.livreur.fullName }}</h6>
+                <p class="mb-1">
+                    <i class="bi bi-telephone"></i> {{ commande.livreur.tel }}
+                </p>
+                {% if commande.livreur.vehicule %}
+                    <p class="mb-0">
+                        <i class="bi bi-bicycle"></i> {{ commande.livreur.vehicule }}
+                    </p>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+
+<div class="modal fade" id="modalAnnuler" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="post" action="{{ path('gestionnaire_commande_annuler', {id: commande.id}) }}">
+                <div class="modal-header">
+                    <h5 class="modal-title">Annuler la commande</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Voulez-vous vraiment annuler la commande <strong>{{ commande.numero }}</strong> ?</p>
+                    <div class="mb-3">
+                        <label class="form-label">Raison de l'annulation</label>
+                        <textarea name="raison" class="form-control" rows="3" 
+                                  placeholder="Optionnel mais recommandé"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+                    <button type="submit" class="btn btn-danger">Confirmer l'annulation</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

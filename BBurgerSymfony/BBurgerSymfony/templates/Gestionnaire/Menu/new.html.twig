@@ -1,0 +1,81 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Nouveau Menu - BB.Resto{% endblock %}
+
+{% block body %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-10">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h1 class="h4 mb-0">
+                        <i class="bi bi-menu-button-wide"></i> Créer un nouveau menu
+                    </h1>
+                </div>
+                <div class="card-body">
+                    {{ form_start(form, {'attr': {'class': 'needs-validation', 'novalidate': 'novalidate'}}) }}
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-8">
+                            {{ form_label(form.libelle, 'Nom du menu', {'label_attr': {'class': 'form-label'}}) }}
+                            {{ form_widget(form.libelle, {'attr': {'class': 'form-control', 'placeholder': 'Ex: Menu Cheese Burger Deluxe'}}) }}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Prix automatique</label>
+                            <div class="alert alert-info">
+                                <i class="bi bi-calculator"></i> Le prix sera calculé automatiquement
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        {{ form_label(form.description, 'Description', {'label_attr': {'class': 'form-label'}}) }}
+                        {{ form_widget(form.description, {'attr': {'class': 'form-control', 'rows': 3, 'placeholder': 'Description du menu...'}}) }}
+                    </div>
+
+                    <h5 class="border-bottom pb-2 mb-3"><i class="bi bi-list-check"></i> Composition du menu</h5>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            {{ form_label(form.burger, 'Burger principal', {'label_attr': {'class': 'form-label'}}) }}
+                            {{ form_widget(form.burger, {'attr': {'class': 'form-control'}}) }}
+                        </div>
+                        <div class="col-md-4">
+                            {{ form_label(form.boisson, 'Boisson', {'label_attr': {'class': 'form-label'}}) }}
+                            {{ form_widget(form.boisson, {'attr': {'class': 'form-control'}}) }}
+                        </div>
+                        <div class="col-md-4">
+                            {{ form_label(form.frites, 'Frites', {'label_attr': {'class': 'form-label'}}) }}
+                            {{ form_widget(form.frites, {'attr': {'class': 'form-control'}}) }}
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        {{ form_label(form.imageFile, 'Image du menu', {'label_attr': {'class': 'form-label'}}) }}
+                        {{ form_widget(form.imageFile, {'attr': {'class': 'form-control'}}) }}
+                        <div class="form-text">
+                            Format accepté: JPG, PNG, WebP. Taille max: 2MB.
+                        </div>
+                    </div>
+
+                    <div class="alert alert-info">
+                        <i class="bi bi-info-circle"></i> Le prix du menu sera calculé automatiquement : 
+                        <strong>(Burger + Boisson + Frites) avec une promotion de 10%</strong>
+                    </div>
+
+                    <div class="d-flex justify-content-between mt-4">
+                        <a href="{{ path('gestionnaire_menu_index') }}" class="btn btn-secondary">
+                            <i class="bi bi-arrow-left"></i> Retour à la liste
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-check-circle"></i> Créer le menu
+                        </button>
+                    </div>
+                    
+                    {{ form_end(form) }}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

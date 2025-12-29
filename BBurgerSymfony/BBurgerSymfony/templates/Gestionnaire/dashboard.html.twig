@@ -1,0 +1,233 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Tableau de bord - BB.Resto Gestionnaire{% endblock %}
+
+{% block body %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h3"><i class="bi bi-speedometer2"></i> Tableau de bord</h1>
+    <span class="text-muted">{{ 'now'|date('d/m/Y H:i') }}</span>
+</div>
+
+
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card stat-card">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h6 class="mb-1">Commandes en cours</h6>
+                    <h2 class="mb-0">{{ nbCommandesEnCours }}</h2>
+                </div>
+                <i class="bi bi-hourglass-split" style="font-size: 3rem; opacity: 0.5;"></i>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="card stat-card" style="background: linear-gradient(135deg, #2a9d8f 0%, #264653 100%);">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h6 class="mb-1">Validées</h6>
+                    <h2 class="mb-0">{{ nbCommandesValidees }}</h2>
+                </div>
+                <i class="bi bi-check-circle" style="font-size: 3rem; opacity: 0.5;"></i>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="card stat-card" style="background: linear-gradient(135deg, #f4a261 0%, #e76f51 100%);">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h6 class="mb-1">Annulées</h6>
+                    <h2 class="mb-0">{{ nbCommandesAnnulees }}</h2>
+                </div>
+                <i class="bi bi-x-circle" style="font-size: 3rem; opacity: 0.5;"></i>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="card stat-card" style="background: linear-gradient(135deg, #06d6a0 0%, #118ab2 100%);">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h6 class="mb-1">Recettes</h6>
+                    <h2 class="mb-0">{{ (recettesJournalieres|number_format(0, ',', ' ')) }} FCFA</h2>
+                </div>
+                <i class="bi bi-cash-stack" style="font-size: 3rem; opacity: 0.5;"></i>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header bg-transparent">
+                <h5 class="mb-0"><i class="bi bi-clock-history"></i> Commandes en cours du jour</h5>
+            </div>
+            <div class="card-body">
+                {% if commandesEnCours is empty %}
+                    <div class="alert alert-info">
+                        <i class="bi bi-info-circle"></i> Aucune commande en cours pour aujourd'hui.
+                    </div>
+                {% else %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Numéro</th>
+                                    <th>Client</th>
+                                    <th>Montant</th>
+                                    <th>Statut</th>
+                                    <th>Type</th>
+                                    <th>Heure</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for commande in commandesEnCours %}
+                                <tr>
+                                    <td><strong>{{ commande.numero }}</strong></td>
+                                    <td>
+                                        <i class="bi bi-person"></i> 
+                                        {{ commande.user.fullName }}
+                                    </td>
+                                    <td><strong>{{ commande.formattedMontant }}</strong></td>
+                                    <td>
+                                        <span class="badge badge-status 
+                                            {% if commande.statut == 'EN_ATTENTE' %}bg-warning
+                                            {% elseif commande.statut == 'VALIDEE' %}bg-info
+                                            {% elseif commande.statut == 'EN_PREPARATION' %}bg-primary
+                                            {% elseif commande.statut == 'PRETE' %}bg-success
+                                            {% elseif commande.statut == 'EN_LIVRAISON' %}bg-dark
+                                            {% endif %}">
+                                            {{ commande.statutLabel }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <small class="text-muted">
+                                            {% if commande.typeRetrait == 'LIVRAISON' %}
+                                                <i class="bi bi-truck"></i> Livraison
+                                            {% elseif commande.typeRetrait == 'A_EMPORTER' %}
+                                                <i class="bi bi-bag"></i> À emporter
+                                            {% else %}
+                                                <i class="bi bi-shop"></i> Sur place
+                                            {% endif %}
+                                        </small>
+                                    </td>
+                                    <td>{{ commande.createdAt|date('H:i') }}</td>
+                                    <td>
+                                        <a href="{{ path('gestionnaire_commande_details', {id: commande.id}) }}" 
+                                           class="btn btn-sm btn-outline-primary">
+                                            <i class="bi bi-eye"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+
+{% if commandesValidees is not empty %}
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header bg-transparent">
+                <h5 class="mb-0"><i class="bi bi-check-circle"></i> Commandes validées du jour</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Numéro</th>
+                                <th>Client</th>
+                                <th>Montant</th>
+                                <th>Type</th>
+                                <th>Heure</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for commande in commandesValidees %}
+                            <tr>
+                                <td><strong>{{ commande.numero }}</strong></td>
+                                <td>{{ commande.user.fullName }}</td>
+                                <td><strong>{{ commande.formattedMontant }}</strong></td>
+                                <td>
+                                    {% if commande.typeRetrait == 'LIVRAISON' %}
+                                        <i class="bi bi-truck"></i> Livraison
+                                    {% elseif commande.typeRetrait == 'A_EMPORTER' %}
+                                        <i class="bi bi-bag"></i> À emporter
+                                    {% else %}
+                                        <i class="bi bi-shop"></i> Sur place
+                                    {% endif %}
+                                </td>
+                                <td>{{ commande.createdAt|date('H:i') }}</td>
+                                <td>
+                                    <a href="{{ path('gestionnaire_commande_details', {id: commande.id}) }}" 
+                                       class="btn btn-sm btn-outline-primary">
+                                        <i class="bi bi-eye"></i> Détails
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+
+{% if commandesAnnulees is not empty %}
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header bg-transparent">
+                <h5 class="mb-0"><i class="bi bi-x-circle"></i> Commandes annulées du jour</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Numéro</th>
+                                <th>Client</th>
+                                <th>Montant</th>
+                                <th>Raison</th>
+                                <th>Heure</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for commande in commandesAnnulees %}
+                            <tr>
+                                <td><strong>{{ commande.numero }}</strong></td>
+                                <td>{{ commande.user.fullName }}</td>
+                                <td><strong>{{ commande.formattedMontant }}</strong></td>
+                                <td>
+                                    <small class="text-muted">
+                                        {{ commande.notes|default('Non spécifiée') }}
+                                    </small>
+                                </td>
+                                <td>{{ commande.createdAt|date('H:i') }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

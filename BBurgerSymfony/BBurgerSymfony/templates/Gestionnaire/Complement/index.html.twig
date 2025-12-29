@@ -1,0 +1,253 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Gestion des Compléments - BB.Resto{% endblock %}
+
+{% block stylesheets %}
+{{ parent() }}
+<style>
+    .complement-image {
+        width: 60px;
+        height: 60px;
+        object-fit: cover;
+        border-radius: 5px;
+        border: 1px solid #dee2e6;
+    }
+    
+    .no-image {
+        width: 60px;
+        height: 60px;
+        background: #f8f9fa;
+        border-radius: 5px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 1px dashed #dee2e6;
+    }
+    
+    .type-badge {
+        min-width: 100px;
+    }
+    
+    .filter-badge {
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+    
+    .filter-badge:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="container-fluid">
+    
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 mb-0">
+                <i class="bi bi-cup-straw text-primary"></i> Gestion des Compléments
+            </h1>
+            <p class="text-muted mb-0">Gérez les boissons, frites et autres accompagnements</p>
+        </div>
+        <a href="{{ path('gestionnaire_complement_new') }}" class="btn btn-primary">
+            <i class="bi bi-plus-circle"></i> Nouveau complément
+        </a>
+    </div>
+
+    
+    <div class="card">
+        <div class="card-header bg-white d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">
+                <i class="bi bi-list"></i> Liste des compléments
+                <span class="badge bg-secondary ms-2">{{ complements|length }}</span>
+            </h5>
+            <div class="btn-group">
+            </div>
+        </div>
+        <div class="card-body p-0">
+            {% if complements|length > 0 %}
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th width="80">Image</th>
+                            <th>Nom</th>
+                            <th width="120">Type</th>
+                            <th width="120">Volume</th>
+                            <th width="120">Prix</th>
+                            <th width="100">Statut</th>
+                            <th width="120">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for complement in complements %}
+                        <tr class="{{ complement.isArchived ? 'table-warning' : '' }}">
+                            <td class="align-middle">
+                                {% if complement.hasImage %}
+                                    <img src="{{ complement.cloudinaryUrl }}" 
+                                         alt="{{ complement.libelle }}" 
+                                         class="complement-image">
+                                {% else %}
+                                    <div class="no-image">
+                                        {% if complement.typeComplement == 'boisson' %}
+                                            <i class="bi bi-cup-straw text-primary fs-4"></i>
+                                        {% elseif complement.typeComplement == 'frites' %}
+                                            <i class="bi bi-egg-fried text-warning fs-4"></i>
+                                        {% elseif complement.typeComplement == 'accompagnement' %}
+                                            <i class="bi bi-shop text-success fs-4"></i>
+                                        {% elseif complement.typeComplement == 'sauce' %}
+                                            <i class="bi bi-droplet text-danger fs-4"></i>
+                                        {% elseif complement.typeComplement == 'dessert' %}
+                                            <i class="bi bi-cake text-info fs-4"></i>
+                                        {% else %}
+                                            <i class="bi bi-shop text-success fs-4"></i>
+                                        {% endif %}
+                                    </div>
+                                {% endif %}
+                            </td>
+                            <td class="align-middle">
+                                <div>
+                                    <strong class="d-block">{{ complement.libelle }}</strong>
+                                    {% if complement.description %}
+                                        <small class="text-muted d-block mt-1" style="font-size: 0.85rem;">
+                                            {{ complement.description|length > 80 ? complement.description|slice(0, 80) ~ '...' : complement.description }}
+                                        </small>
+                                    {% endif %}
+                                    <small class="text-muted">
+                                        <i class="bi bi-calendar"></i> {{ complement.createdAt|date('d/m/Y') }}
+                                    </small>
+                                </div>
+                            </td>
+                            <td class="align-middle">
+                                {% if complement.typeComplement == 'boisson' %}
+                                    <span class="badge bg-primary type-badge">
+                                        <i class="bi bi-cup-straw"></i> Boisson
+                                    </span>
+                                {% elseif complement.typeComplement == 'frites' %}
+                                    <span class="badge bg-warning type-badge">
+                                        <i class="bi bi-egg-fried"></i> Frites
+                                    </span>
+                                {% elseif complement.typeComplement == 'accompagnement' %}
+                                    <span class="badge bg-success type-badge">
+                                        <i class="bi bi-shop"></i> Accompagnement
+                                    </span>
+                                {% elseif complement.typeComplement == 'sauce' %}
+                                    <span class="badge bg-danger type-badge">
+                                        <i class="bi bi-droplet"></i> Sauce
+                                    </span>
+                                {% elseif complement.typeComplement == 'dessert' %}
+                                    <span class="badge bg-info type-badge">
+                                        <i class="bi bi-cake"></i> Dessert
+                                    </span>
+                                {% else %}
+                                    <span class="badge bg-secondary type-badge">
+                                        {{ complement.typeComplement|capitalize }}
+                                    </span>
+                                {% endif %}
+                            </td>
+                            <td class="align-middle">
+                                {% if complement.volume %}
+                                    <span class="badge bg-secondary">
+                                        {{ complement.volume|capitalize }}
+                                    </span>
+                                {% else %}
+                                    <span class="text-muted">-</span>
+                                {% endif %}
+                            </td>
+                            <td class="align-middle">
+                                <strong class="text-success">{{ complement.formattedPrix }}</strong>
+                            </td>
+                            <td class="align-middle">
+                                {% if complement.isArchived %}
+                                    <span class="badge bg-danger">
+                                        <i class="bi bi-archive"></i> Archivé
+                                    </span>
+                                {% else %}
+                                    <span class="badge bg-success">
+                                        <i class="bi bi-check-circle"></i> Actif
+                                    </span>
+                                {% endif %}
+                            </td>
+                            <td class="align-middle">
+                                <div class="btn-group" role="group">
+                                    <a href="{{ path('gestionnaire_complement_edit', {id: complement.id}) }}" 
+                                       class="btn btn-sm btn-outline-primary" 
+                                       title="Modifier">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                    
+                                    {% if complement.isArchived %}
+                                        <form method="post" 
+                                              action="{{ path('gestionnaire_complement_restore', {id: complement.id}) }}" 
+                                              class="d-inline"
+                                              onsubmit="return confirm('Restaurer ce complément ?')">
+                                            <input type="hidden" name="_token" value="{{ csrf_token('restore' ~ complement.id) }}">
+                                            <button type="submit" class="btn btn-sm btn-outline-success" title="Restaurer">
+                                                <i class="bi bi-arrow-clockwise"></i>
+                                            </button>
+                                        </form>
+                                    {% else %}
+                                        <form method="post" 
+                                              action="{{ path('gestionnaire_complement_archive', {id: complement.id}) }}" 
+                                              class="d-inline"
+                                              onsubmit="return confirm('Archiver ce complément ? Il ne sera plus disponible pour les nouvelles commandes.')">
+                                            <input type="hidden" name="_token" value="{{ csrf_token('archive' ~ complement.id) }}">
+                                            <button type="submit" class="btn btn-sm btn-outline-warning" title="Archiver">
+                                                <i class="bi bi-archive"></i>
+                                            </button>
+                                        </form>
+                                    {% endif %}
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="text-center py-5">
+                {% if app.request.query.get('type') %}
+                    <i class="bi bi-search display-1 text-muted"></i>
+                    <h4 class="mt-3 text-muted">Aucun complément trouvé</h4>
+                    <p class="text-muted mb-4">
+                        Aucun complément de type "{{ app.request.query.get('type') }}" n'a été trouvé.
+                    </p>
+                    <a href="{{ path('gestionnaire_complement_new') }}" class="btn btn-primary">
+                        <i class="bi bi-plus-circle"></i> Créer un nouveau complément
+                    </a>
+                    <a href="{{ path('gestionnaire_complement_index') }}" class="btn btn-outline-secondary ms-2">
+                        <i class="bi bi-eye"></i> Voir tous les compléments
+                    </a>
+                {% else %}
+                    <i class="bi bi-cup-straw display-1 text-muted"></i>
+                    <h4 class="mt-3 text-muted">Aucun complément trouvé</h4>
+                    <p class="text-muted mb-4">
+                        Commencez par créer votre premier complément (boisson, frites, accompagnement...)
+                    </p>
+                    <a href="{{ path('gestionnaire_complement_new') }}" class="btn btn-primary btn-lg">
+                        <i class="bi bi-plus-circle"></i> Créer votre premier complément
+                    </a>
+                {% endif %}
+            </div>
+            {% endif %}
+        </div>
+        {% if complements|length > 0 %}
+        <div class="card-footer bg-white">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <small class="text-muted">
+                        Affichage de {{ complements|length }} complément(s)
+                    </small>
+                </div>
+                <div>
+                    <small class="text-muted">
+                        Dernière mise à jour : {{ "now"|date("d/m/Y H:i") }}
+                    </small>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
