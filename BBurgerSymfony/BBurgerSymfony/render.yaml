@@ -1,0 +1,45 @@
+services:
+  - type: web
+    name: bb-burger-gestionnaire
+    env: php
+    region: ohio
+    plan: free
+    branch: symfony
+    
+    buildCommand: |
+      # Mettre à jour Composer
+      composer self-update
+      # Installation production
+      composer install --no-dev --no-interaction --optimize-autoloader --no-scripts
+      # Scripts post-install
+      APP_ENV=prod php bin/console cache:clear --no-warmup
+      php bin/console assets:install public --env=prod --no-debug
+      APP_ENV=prod php bin/console cache:warmup
+    
+    startCommand: php -S 0.0.0.0:$PORT -t public
+    
+    healthCheckPath: /login
+    
+    envVars:
+      - key: APP_ENV
+        value: prod
+      - key: APP_SECRET
+        generateValue: true
+      - key: DATABASE_URL
+        fromDatabase:
+          name: bb-burger-db
+          property: connectionString
+      
+      - key: CLOUDINARY_CLOUD_NAME
+        sync: false
+      - key: CLOUDINARY_API_KEY
+        sync: false
+      - key: CLOUDINARY_API_SECRET
+        sync: false
+      - key: CLOUDINARY_URL
+        sync: false
+
+databases:
+  - name: bb-burger-db
+    databaseName: bb_burger
+    plan: free
