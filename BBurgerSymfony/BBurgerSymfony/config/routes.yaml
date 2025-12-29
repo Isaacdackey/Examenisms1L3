@@ -1,0 +1,13 @@
+# config/routes.yaml
+
+# Syntaxe correcte pour Symfony 6.1
+controllers:
+    resource: ../src/Controller/
+    type: attribute
+
+# Ou si vous voulez spécifier explicitement le namespace
+# controllers:
+#     resource: ../src/Controller/
+#     type: attribute
+#     prefix: /
+#     # Le namespace est automatiquement déduit du chemin

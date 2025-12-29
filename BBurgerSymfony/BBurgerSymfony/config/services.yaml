@@ -1,0 +1,54 @@
+services:
+    _defaults:
+        autowire: true
+        autoconfigure: true
+        public: false
+
+    App\:
+        resource: '../src/'
+        exclude:
+            - '../src/DependencyInjection/'
+            - '../src/Entity/'
+            - '../src/Kernel.php'
+
+    # Repositories
+    App\Repository\Query\BurgerRepository:
+        tags: ['doctrine.repository_service']
+
+    App\Repository\Query\CommandeRepository:
+        tags: ['doctrine.repository_service']
+
+    App\Repository\Query\MenuRepository:
+        tags: ['doctrine.repository_service']
+
+    App\Repository\Query\ComplementRepository:
+        tags: ['doctrine.repository_service']
+
+    App\Repository\Query\StatistiqueRepository:
+        tags: ['doctrine.repository_service']
+
+    # Services Core
+    App\Service\Core\ImageUploaderService:
+        arguments:
+            $cloudinaryUrl: '%env(CLOUDINARY_URL)%'
+            $cloudName: '%env(CLOUDINARY_CLOUD_NAME)%'
+            $apiKey: '%env(CLOUDINARY_API_KEY)%'
+            $apiSecret: '%env(CLOUDINARY_API_SECRET)%'
+
+    App\Service\Core\PrixCalculatorService: ~
+    App\Service\Core\CommandeWorkflowService: ~
+
+    # Services Manager
+    App\Service\Manager\CommandeManager: ~
+    App\Service\Manager\StatistiqueManager: ~
+    App\Service\Manager\LivraisonManager: ~
+
+    # Controllers
+    App\Controller\Gestionnaire\:
+        resource: '../src/Controller/Gestionnaire/'
+        tags: ['controller.service_arguments']
+
+    App\Controller\:
+        resource: '../src/Controller/'
+        tags: ['controller.service_arguments']
+        exclude: '../src/Controller/Gestionnaire/'
