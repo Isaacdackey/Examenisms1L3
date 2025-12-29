@@ -6,7 +6,7 @@ services:
     plan: free
     branch: symfony
 
-    rootDir: .
+    rootDir: BBurgerSymfony/BBurgerSymfony
     dockerContextDir: .
     dockerfilePath: Dockerfile
 
