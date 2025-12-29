@@ -3,8 +3,8 @@ services:
     name: bb-burger-gestionnaire
     runtime: docker
     rootDir: ./BBBurgerSymfony/BBBurgerSymfony
-    dockerContextDir: .
-    dockerfilePath: ./BBBurgerSymfony/BBBurgerSymfony/Dockerfile
+    dockerContextDir: ./BBBurgerSymfony/BBBurgerSymfony
+    dockerfilePath: ./Dockerfile  
     region: frankfurt
     plan: free
     branch: symfony
