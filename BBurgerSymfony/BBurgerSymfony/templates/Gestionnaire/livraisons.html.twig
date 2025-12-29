@@ -1,0 +1,322 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Gestion des livraisons{% endblock %}
+
+{% block stylesheets %}
+{{ parent() }}
+<style>
+.commande-checkbox {
+    cursor: pointer;
+}
+.livraison-form {
+    margin-bottom: 0;
+}
+.table-warning {
+    background-color: #fff3cd !important;
+}
+.table-info {
+    background-color: #d1ecf1 !important;
+}
+.table-success {
+    background-color: #d4edda !important;
+}
+.table-primary {
+    background-color: #cce5ff !important;
+}
+.zone-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="container-fluid">
+    <h1 class="h3 mb-4">
+        <i class="bi bi-truck"></i> Gestion des livraisons par zone
+    </h1>
+
+    
+
+    <div class="card mb-4">
+        <div class="card-body">
+            <div class="alert alert-info mb-3">
+                <strong><i class="bi bi-info-circle"></i> Information :</strong> 
+                Seules les commandes avec statut <span class="badge bg-warning">PRETE</span> peuvent être assignées à un livreur.
+                Les autres statuts sont affichés pour information seulement.
+            </div>
+            
+            <div class="btn-group" role="group">
+                <a href="{{ path('gestionnaire_livraisons') }}?statut=PRETE" 
+                   class="btn btn-outline-warning {{ app.request.query.get('statut') == 'PRETE' or not app.request.query.get('statut') ? 'active' : '' }}">
+                    <i class="bi bi-clock"></i> À livrer (PRETE)
+                </a>
+                <a href="{{ path('gestionnaire_livraisons') }}?statut=TOUS" 
+                   class="btn btn-outline-info {{ app.request.query.get('statut') == 'TOUS' ? 'active' : '' }}">
+                    <i class="bi bi-list"></i> Toutes les livraisons
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    
+    {% for zoneId, data in commandesParZone %}
+    <div class="card mb-4">
+        <div class="card-header {% if data.zone %}bg-primary text-white{% else %}bg-secondary text-white{% endif %}">
+            <div class="zone-header">
+                <div>
+                    <h5 class="mb-0">
+                        <i class="bi bi-geo-alt"></i> {{ data.nom }}
+                    </h5>
+                    <div class="d-flex align-items-center gap-3 mt-2">
+                        <span class="badge bg-light text-dark">
+                            <i class="bi bi-box"></i> {{ data.total }} commande(s)
+                        </span>
+                        {% if data.zone %}
+                            <span class="badge bg-light text-dark">
+                                <i class="bi bi-cash"></i> Frais : {{ data.zone.prixLivraison|number_format(0, ',', ' ') }} FCFA
+                            </span>
+                        {% endif %}
+                    </div>
+                </div>
+                <div>
+                    {% if data.commandes|filter(c => c.statut == 'PRETE')|length > 0 %}
+                        <span class="badge bg-warning">
+                            {{ data.commandes|filter(c => c.statut == 'PRETE')|length }} à livrer
+                        </span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <div class="card-body">
+            {% if data.commandes is not empty %}
+            <form action="{{ path('gestionnaire_assigner_zone') }}" method="POST" class="livraison-form" 
+                  onsubmit="return validateLivraisonForm(this)">
+                
+                
+                <input type="hidden" name="zone_id" value="{{ data.zone ? data.zone.id : 0 }}">
+                
+                {% if not data.zone %}
+                <div class="alert alert-warning mb-3">
+                    <i class="bi bi-exclamation-triangle"></i> 
+                    <strong>Attention :</strong> Cette commande n'a pas de zone assignée. 
+                    Vous devez sélectionner une zone manuellement.
+                    <div class="mt-2">
+                        <label class="form-label">Sélectionnez une zone :</label>
+                        <select name="zone_id_select" class="form-select" required>
+                            <option value="">-- Choisir une zone --</option>
+                            <option value="1">Zone Centre (1 000 FCFA)</option>
+                            <option value="2">Zone Nord (1 500 FCFA)</option>
+                            <option value="3">Zone Sud (2 000 FCFA)</option>
+                        </select>
+                    </div>
+                </div>
+                {% endif %}
+                
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label for="livreur_{{ zoneId }}" class="form-label">
+                            <i class="bi bi-person-badge"></i> Sélectionner un livreur
+                        </label>
+                        <select name="livreur_id" id="livreur_{{ zoneId }}" class="form-select" required>
+                            <option value="">-- Choisir un livreur --</option>
+                            {% for livreur in livreurs %}
+                            <option value="{{ livreur.id }}">
+                                {{ livreur.nom }} {{ livreur.prenom }} 
+                                {% if livreur.vehicule %} - {{ livreur.vehicule }}{% endif %}
+                                {% if not livreur.vehicule %}- Sans véhicule{% endif %}
+                            </option>
+                            {% endfor %}
+                        </select>
+                        <div class="form-text">
+                            {{ livreurs|length }} livreur(s) disponible(s)
+                        </div>
+                    </div>
+                    <div class="col-md-6 d-flex align-items-end">
+                        <button type="submit" class="btn btn-success w-100">
+                            <i class="fas fa-truck me-2"></i> 
+                            Assigner les commandes sélectionnées
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th width="50">
+                                    <input type="checkbox" 
+                                           id="select_all_{{ zoneId }}" 
+                                           class="form-check-input"
+                                           onchange="toggleAllCheckboxes('{{ zoneId }}', this.checked)">
+                                </th>
+                                <th>Numéro</th>
+                                <th>Client</th>
+                                <th>Statut</th>
+                                <th>Adresse</th>
+                                <th>Montant</th>
+                                <th>Heure</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% set commandesPretes = 0 %}
+                            {% for commande in data.commandes %}
+                            {% if commande.statut == 'PRETE' %}
+                                {% set commandesPretes = commandesPretes + 1 %}
+                            {% endif %}
+                            <tr class="
+                                {% if commande.statut == 'PRETE' %}table-warning
+                                {% elseif commande.statut == 'EN_LIVRAISON' %}table-info
+                                {% elseif commande.statut == 'TERMINEE' %}table-success
+                                {% elseif commande.statut == 'VALIDEE' %}table-primary
+                                {% endif %}
+                            ">
+                                <td>
+                                    {% if commande.statut == 'PRETE' %}
+                                        <input type="checkbox" 
+                                               name="commandes[]"
+                                               value="{{ commande.id }}" 
+                                               class="form-check-input commande-checkbox checkbox-zone-{{ zoneId }}"
+                                               id="commande_{{ commande.id }}"
+                                               data-commande="{{ commande.numero }}">
+                                    {% else %}
+                                        <span class="text-muted">-</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <strong>{{ commande.numero }}</strong>
+                                    {% if commande.statut != 'PRETE' %}
+                                        <br><small class="text-muted">(non assignable)</small>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if commande.user %}
+                                        {{ commande.user.nom }} {{ commande.user.prenom }}
+                                        <br><small class="text-muted">{{ commande.user.telephone|default('') }}</small>
+                                    {% else %}
+                                        Client inconnu
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if commande.statut == 'PRETE' %}
+                                        <span class="badge bg-warning">
+                                            <i class="bi bi-clock"></i> À livrer
+                                        </span>
+                                    {% elseif commande.statut == 'EN_LIVRAISON' %}
+                                        <span class="badge bg-info">
+                                            <i class="bi bi-truck"></i> En cours
+                                        </span>
+                                    {% elseif commande.statut == 'TERMINEE' %}
+                                        <span class="badge bg-success">
+                                            <i class="bi bi-check-circle"></i> Livrée
+                                        </span>
+                                    {% elseif commande.statut == 'VALIDEE' %}
+                                        <span class="badge bg-primary">
+                                            <i class="bi bi-check"></i> Validée
+                                        </span>
+                                    {% else %}
+                                        <span class="badge bg-secondary">{{ commande.statut }}</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {{ commande.adresse|default('Adresse non spécifiée') }}
+                                    {% if data.zone and data.zone.quartiersCouverts %}
+                                        <br><small class="text-muted">{{ data.zone.quartiersCouverts }}</small>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <strong>{{ commande.montantTotal|number_format(0, ',', ' ') }} FCFA</strong>
+                                    {% if data.zone %}
+                                        <br><small class="text-muted">+ {{ data.zone.prixLivraison|number_format(0, ',', ' ') }} FCFA livraison</small>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {{ commande.createdAt|date('H:i') }}
+                                    <br><small class="text-muted">{{ commande.createdAt|date('d/m') }}</small>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                
+                {% if commandesPretes == 0 and data.commandes is not empty %}
+                <div class="alert alert-warning mt-3">
+                    <i class="bi bi-exclamation-triangle"></i>
+                    Aucune commande n'est actuellement <span class="badge bg-warning">PRETE</span> dans cette zone.
+                    Seules les commandes avec statut "PRETE" peuvent être assignées à un livreur.
+                </div>
+                {% endif %}
+            </form>
+            
+            {% else %}
+            <div class="alert alert-info mb-0">
+                <i class="bi bi-info-circle"></i> Aucune commande pour la livraison dans cette zone.
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    {% else %}
+    <div class="card">
+        <div class="card-body text-center py-5">
+            <i class="bi bi-truck display-1 text-muted"></i>
+            <h3 class="mt-4 text-muted">Aucune commande disponible</h3>
+            <p class="text-muted mb-4">
+                Aucune commande n'est actuellement disponible pour la livraison.
+            </p>
+            <a href="{{ path('gestionnaire_commandes') }}" class="btn btn-primary">
+                <i class="bi bi-list"></i> Voir toutes les commandes
+            </a>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<script>
+
+function toggleAllCheckboxes(zoneId, checked) {
+    const checkboxes = document.querySelectorAll(`.checkbox-zone-${zoneId}`);
+    checkboxes.forEach(checkbox => {
+        checkbox.checked = checked;
+    });
+}
+
+
+function validateLivraisonForm(form) {
+    const livreurSelect = form.querySelector('select[name="livreur_id"]');
+    const checkboxes = form.querySelectorAll('input[name="commandes[]"]:checked');
+    
+    
+    if (!livreurSelect.value) {
+        alert('Veuillez sélectionner un livreur.');
+        livreurSelect.focus();
+        return false;
+    }
+    
+    
+    if (checkboxes.length === 0) {
+        alert('Veuillez sélectionner au moins une commande à livrer.');
+        return false;
+    }
+    
+    
+    const livreurName = livreurSelect.options[livreurSelect.selectedIndex].text;
+    return confirm(`Assigner ${checkboxes.length} commande(s) au livreur ${livreurName} ?`);
+}
+
+
+document.addEventListener('DOMContentLoaded', function() {
+    
+    document.querySelectorAll('input[id^="select_all_"]').forEach(checkbox => {
+        const zoneId = checkbox.id.replace('select_all_', '');
+        const checkboxesCount = document.querySelectorAll(`.checkbox-zone-${zoneId}`).length;
+        if (checkboxesCount === 0) {
+            checkbox.disabled = true;
+            checkbox.title = "Aucune commande PRETE dans cette zone";
+        }
+    });
+});
+</script>
+{% endblock %}
