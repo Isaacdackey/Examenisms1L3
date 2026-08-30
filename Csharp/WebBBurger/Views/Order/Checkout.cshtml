@@ -7,7 +7,7 @@
         <div style="width:44px; height:44px; background:var(--primary); color:var(--white); border-radius:12px; display:grid; place-items:center;"><i class="fas fa-clipboard-check"></i></div>
         <div>
             <h1 class="h4 mb-0" style="letter-spacing:-0.02em;">Validation de commande</h1>
-            <p class="text-muted mb-0" style="font-size:0.88rem;">Plus qu''une étape avant de vous régaler</p>
+            <p class="text-muted mb-0" style="font-size:0.88rem;">Plus qu'une étape avant de vous régaler</p>
         </div>
         <a href="@Url.Action("Index", "Cart")" class="btn btn-outline-secondary ms-auto d-none d-md-inline-flex" style="border-radius:999px;">← Panier</a>
     </div>
@@ -147,24 +147,25 @@
     <script>
         $(function(){
             function toggleZones(){
-                var isLiv = $(''input[name="TypeRetrait"]:checked'').val() === ''LIVRAISON'';
-                $(''#zonesLivraison'').toggle(isLiv);
-                if(isLiv) { $(''#ZoneId'').prop(''required'', true); updateFrais(); } else { $(''#ZoneId'').prop(''required'', false); $(''#fraisLivraisonText'').text(''0 FCFA''); updateTotal(); }
-                $(''label.payment-option'').removeClass(''selected'');
-                $(''input[name="TypeRetrait"]:checked'').closest(''label'').addClass(''selected'');
+                var isLiv = $('input[name="TypeRetrait"]:checked').val() === 'LIVRAISON';
+                $('#zonesLivraison').toggle(isLiv);
+                if(isLiv) { $('#ZoneId').prop('required', true); updateFrais(); } else { $('#ZoneId').prop('required', false); $('#fraisLivraisonText').text('0 FCFA'); updateTotal(); }
+                $('label.payment-option').removeClass('selected');
+                $('input[name="TypeRetrait"]:checked').closest('label').addClass('selected');
             }
             function updateFrais(){
-                var frais=0; var v=$(''#ZoneId'').val(); if(v){ frais=parseFloat($(''#ZoneId option:selected'').data(''prix''))||0; }
-                $(''#fraisLivraisonText'').text(frais.toLocaleString(''fr-FR'')+'' FCFA''); updateTotal();
+                var frais=0; var v=$('#ZoneId').val(); if(v){ frais=parseFloat($('#ZoneId option:selected').data('prix'))||0; }
+                $('#fraisLivraisonText').text(frais.toLocaleString('fr-FR')+' FCFA'); updateTotal();
             }
             function updateTotal(){
-                var sous=@Model.TotalCommande; var frais=parseFloat($(''#fraisLivraisonText'').text().replace(/[^0-9]/g,''''))||0; $(''#totalAPayerText'').text((sous+frais).toLocaleString(''fr-FR'')+'' FCFA'');
+                var sous=@Model.TotalCommande; var frais=parseFloat($('#fraisLivraisonText').text().replace(/[^0-9]/g,''))||0; $('#totalAPayerText').text((sous+frais).toLocaleString('fr-FR')+' FCFA');
             }
-            $(''input[name="TypeRetrait"]'').on(''change'', toggleZones);
-            $(''#ZoneId'').on(''change'', updateFrais);
-            $(''input[name="MoyenPaiement"]'').on(''change'', function(){ $(''.payment-option'').removeClass(''selected''); $(''input[name="MoyenPaiement"]:checked'').closest(''.payment-option'').addClass(''selected''); });
+            $('input[name="TypeRetrait"]').on('change', toggleZones);
+            $('#ZoneId').on('change', updateFrais);
+            $('input[name="MoyenPaiement"]').on('change', function(){ $('.payment-option').removeClass('selected'); $('input[name="MoyenPaiement"]:checked').closest('.payment-option').addClass('selected'); });
             toggleZones(); updateTotal();
-            if($(''input[name="MoyenPaiement"]:checked'').length) $(''input[name="MoyenPaiement"]:checked'').trigger(''change'');
+            if($('input[name="MoyenPaiement"]:checked').length) $('input[name="MoyenPaiement"]:checked').trigger('change');
         });
     </script>
 }
+

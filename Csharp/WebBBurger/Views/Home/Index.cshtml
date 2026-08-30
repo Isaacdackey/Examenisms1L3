@@ -145,7 +145,7 @@ else
                         <p class="text-muted mx-auto" style="max-width:520px;">
                             @if (!string.IsNullOrEmpty(searchParam))
                             {
-                                <text>Aucun résultat pour "<strong>@searchParam</strong>". Vérifiez l''orthographe ou essayez un autre mot-clé.</text>
+                                <text>Aucun résultat pour "<strong>@searchParam</strong>". Vérifiez l'orthographe ou essayez un autre mot-clé.</text>
                             }
                             else if (!string.IsNullOrEmpty(typeParam))
                             {
@@ -227,18 +227,19 @@ else
     <script>
         $(function(){
             
-            $(''a[href="#catalogue"]'').on(''click'', function(e){
+            $('a[href="#catalogue"]').on('click', function(e){
                 e.preventDefault();
-                document.querySelector(''#catalogue'')?.scrollIntoView({behavior:''smooth'', block:''start''});
+                document.querySelector('#catalogue')?.scrollIntoView({behavior:'smooth', block:'start'});
             });
 
             const obs = new IntersectionObserver((entries)=>{
-                entries.forEach(ent=>{ if(ent.isIntersecting) ent.target.classList.add(''visible''); });
+                entries.forEach(ent=>{ if(ent.isIntersecting) ent.target.classList.add('visible'); });
             }, {threshold:0.08});
-            document.querySelectorAll(''.reveal'').forEach(el=>obs.observe(el));
+            document.querySelectorAll('.reveal').forEach(el=>obs.observe(el));
         });
     </script>
 }
+
 
 
 

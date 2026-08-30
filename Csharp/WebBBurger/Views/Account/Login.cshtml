@@ -27,7 +27,7 @@
                             <div class="input-group">
                                 <span class="input-group-text"><i class="fas fa-lock"></i></span>
                                 <input asp-for="Password" type="password" class="form-control" placeholder="••••••••" autocomplete="current-password" id="pwd" />
-                                <button class="btn btn-outline-secondary" type="button" onclick="var i=document.getElementById(''pwd''); i.type=i.type===''password''?''text'':''password''; this.querySelector(''i'').classList.toggle(''fa-eye''); this.querySelector(''i'').classList.toggle(''fa-eye-slash'')" style="border-radius:0 var(--radius-md) var(--radius-md) 0"><i class="fas fa-eye"></i></button>
+                                <button class="btn btn-outline-secondary" type="button" onclick="var i=document.getElementById('pwd'); i.type=i.type==='password'?'text':'password'; this.querySelector('i').classList.toggle('fa-eye'); this.querySelector('i').classList.toggle('fa-eye-slash')" style="border-radius:0 var(--radius-md) var(--radius-md) 0"><i class="fas fa-eye"></i></button>
                             </div>
                             <span asp-validation-for="Password" class="text-danger"></span>
                         </div>
@@ -50,3 +50,4 @@
     </div>
 </div>
 @section Scripts { @{await Html.RenderPartialAsync("_ValidationScriptsPartial");} }
+

@@ -136,49 +136,50 @@
         // Recap dynamique - global pour que les boutons inline fonctionnent meme avant DOM ready
         var burgerBasePrice = @prix;
         function calcBurgerRecap(){
-            var q = parseInt(document.getElementById(''quantityInput'')?.value)||1;
+            var q = parseInt(document.getElementById('quantityInput')?.value)||1;
             var bP=0, fP=0;
-            var bSel = document.getElementById(''boissonSelect'');
-            if(bSel && bSel.value !== ''''){
+            var bSel = document.getElementById('boissonSelect');
+            if(bSel && bSel.value !== ''){
                 var opt = bSel.options[bSel.selectedIndex];
-                bP = parseFloat(opt.getAttribute(''data-price''))||0;
-                document.getElementById(''boissonLine'').style.display=''flex'';
-                document.getElementById(''boissonPrice'').textContent = bP.toLocaleString(''fr-FR'');
-                document.getElementById(''boissonQty'').textContent = q;
+                bP = parseFloat(opt.getAttribute('data-price'))||0;
+                document.getElementById('boissonLine').style.display='flex';
+                document.getElementById('boissonPrice').textContent = bP.toLocaleString('fr-FR');
+                document.getElementById('boissonQty').textContent = q;
             } else {
-                var bl=document.getElementById(''boissonLine''); if(bl) bl.style.display=''none'';
+                var bl=document.getElementById('boissonLine'); if(bl) bl.style.display='none';
             }
-            var fSel = document.getElementById(''fritesSelect'');
-            if(fSel && fSel.value !== ''''){
+            var fSel = document.getElementById('fritesSelect');
+            if(fSel && fSel.value !== ''){
                 var opt2 = fSel.options[fSel.selectedIndex];
-                fP = parseFloat(opt2.getAttribute(''data-price''))||0;
-                document.getElementById(''fritesLine'').style.display=''flex'';
-                document.getElementById(''fritesPrice'').textContent = fP.toLocaleString(''fr-FR'');
-                document.getElementById(''fritesQty'').textContent = q;
+                fP = parseFloat(opt2.getAttribute('data-price'))||0;
+                document.getElementById('fritesLine').style.display='flex';
+                document.getElementById('fritesPrice').textContent = fP.toLocaleString('fr-FR');
+                document.getElementById('fritesQty').textContent = q;
             } else {
-                var fl=document.getElementById(''fritesLine''); if(fl) fl.style.display=''none'';
+                var fl=document.getElementById('fritesLine'); if(fl) fl.style.display='none';
             }
-            document.getElementById(''displayQty'').textContent = q;
+            document.getElementById('displayQty').textContent = q;
             var total=(burgerBasePrice+bP+fP)*q;
-            document.getElementById(''totalPrice'').textContent = total.toLocaleString(''fr-FR'')+'' FCFA'';
+            document.getElementById('totalPrice').textContent = total.toLocaleString('fr-FR')+' FCFA';
         }
         // Override site.js fallback des que possible
         window.changeQuantity = function(d){
-            var inp=document.getElementById(''quantityInput'') || document.getElementById(''quantity'');
+            var inp=document.getElementById('quantityInput') || document.getElementById('quantity');
             if(!inp) return;
             var v=parseInt(inp.value)||1;
             v=Math.min(10,Math.max(1,v+d));
             inp.value=v;
-            inp.dispatchEvent(new Event(''change''));
+            inp.dispatchEvent(new Event('change'));
             calcBurgerRecap();
         };
         $(function(){
-            $(''#boissonSelect,#fritesSelect'').on(''change'', calcBurgerRecap);
-            $(''#quantityInput'').on(''change input'', calcBurgerRecap);
+            $('#boissonSelect,#fritesSelect').on('change', calcBurgerRecap);
+            $('#quantityInput').on('change input', calcBurgerRecap);
             calcBurgerRecap();
-            $(''#burgerForm'').on(''submit'', function(){ $(this).find(''button[type="submit"]'').html(''<i class="fas fa-spinner fa-spin me-2"></i>Traitement...'').prop(''disabled'',true); });
+            $('#burgerForm').on('submit', function(){ $(this).find('button[type="submit"]').html('<i class="fas fa-spinner fa-spin me-2"></i>Traitement...').prop('disabled',true); });
         });
     </script>
 }
+
 
 

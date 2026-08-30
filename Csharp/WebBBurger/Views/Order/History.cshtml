@@ -26,7 +26,7 @@
                                 <form asp-action="Cancel" asp-controller="Order" method="post" class="d-inline">
                                     @Html.AntiForgeryToken()
                                     <input type="hidden" name="id" value="@c.Id" />
-                                    <button type="submit" class="btn btn-sm" style="background:var(--danger-light); color:var(--danger); border:1px solid #fecaca; border-radius:999px; font-weight:700;" onclick="return confirm(''Êtes-vous sûr de vouloir annuler cette commande ?')"><i class="fas fa-times me-1"></i> Annuler</button>
+                                    <button type="submit" class="btn btn-sm" style="background:var(--danger-light); color:var(--danger); border:1px solid #fecaca; border-radius:999px; font-weight:700;" onclick="return confirm('Êtes-vous sûr de vouloir annuler cette commande ?')"><i class="fas fa-times me-1"></i> Annuler</button>
                                 </form>
                             }
                             @if (c.Statut == "EN_ATTENTE")
@@ -64,3 +64,4 @@
     };
     bool CanCancel(string statut) => statut == "EN_ATTENTE" || statut == "VALIDEE";
 }
+

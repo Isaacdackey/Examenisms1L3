@@ -46,17 +46,18 @@
 @section Scripts{
 <script>
 $(function(){
-    $(''#contactForm'').on(''submit'', function(e){
+    $('#contactForm').on('submit', function(e){
         e.preventDefault();
         if(!this.checkValidity()){ this.reportValidity(); return; }
-        var toast = $(''#contactToast'');
-        toast.removeClass(''d-none'').hide().fadeIn(300);
+        var toast = $('#contactToast');
+        toast.removeClass('d-none').hide().fadeIn(300);
         // auto hide after 4s
-        setTimeout(function(){ toast.fadeOut(400, function(){ toast.addClass(''d-none''); }); }, 4000);
+        setTimeout(function(){ toast.fadeOut(400, function(){ toast.addClass('d-none'); }); }, 4000);
         this.reset();
         // fallback alert si JS desactive ? non
-        // ancien: alert(''Merci pour votre message ! Nous vous repondrons dans les plus brefs delais.'');
+        // ancien: alert('Merci pour votre message ! Nous vous repondrons dans les plus brefs delais.');
     });
 });
 </script>
 }
+

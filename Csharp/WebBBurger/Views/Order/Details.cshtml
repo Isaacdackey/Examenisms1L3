@@ -49,7 +49,7 @@
                         <form asp-action="Cancel" asp-controller="Order" method="post" class="d-grid">
                             @Html.AntiForgeryToken()
                             <input type="hidden" name="id" value="@Model.Id" />
-                            <button type="submit" class="btn" style="background:var(--danger-light); color:var(--danger); border:1.5px solid #fecaca; border-radius:999px; font-weight:700;" onclick="return confirm(''Êtes-vous sûr de vouloir annuler cette commande ?')"><i class="fas fa-times me-1"></i> Annuler la commande</button>
+                            <button type="submit" class="btn" style="background:var(--danger-light); color:var(--danger); border:1.5px solid #fecaca; border-radius:999px; font-weight:700;" onclick="return confirm('Êtes-vous sûr de vouloir annuler cette commande ?')"><i class="fas fa-times me-1"></i> Annuler la commande</button>
                         </form>
                     }
                     <a href="@Url.Action("History", "Order")" class="btn btn-outline-secondary" style="border-radius:999px;">Historique</a>
@@ -73,3 +73,4 @@
     };
     bool CanCancel(string s) => s == "EN_ATTENTE" || s == "VALIDEE";
 }
+

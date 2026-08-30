@@ -153,7 +153,7 @@
                 <div class="col-lg-4 col-md-6">
                     <h5><i class="fas fa-hamburger"></i> Brasil Burger</h5>
                     <p class="mb-3" style="color:rgba(255,255,255,0.6); font-size:0.92rem; line-height:1.7;">
-                        L''art du burger artisanal à Dakar. Viandes sélectionnées, pains moelleux, frites croustillantes et sauces maison. Fraîcheur et passion à chaque bouchée.
+                        L'art du burger artisanal à Dakar. Viandes sélectionnées, pains moelleux, frites croustillantes et sauces maison. Fraîcheur et passion à chaque bouchée.
                     </p>
                     <div class="social">
                         <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
@@ -197,7 +197,7 @@
     @await RenderSectionAsync("Scripts", required: false)
     <script>
         $(function(){
-            var tooltipTriggerList = [].slice.call(document.querySelectorAll(''[data-bs-toggle="tooltip"]''));
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
             tooltipTriggerList.forEach(function (el) { return new bootstrap.Tooltip(el); });
         });
     </script>
@@ -211,5 +211,6 @@
         return (currentController == controller && currentAction == action) ? "active" : "";
     }
 }
+
 
 

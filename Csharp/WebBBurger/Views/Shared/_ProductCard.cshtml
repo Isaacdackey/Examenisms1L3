@@ -1,7 +1,7 @@
 ﻿@model WebBBurger.Models.ViewModels.ProductViewModel
 <div class="card product-card h-100">
     <div class="img-wrap">
-        <img src="@Model.ImageUrl" class="card-img-top" alt="@Model.Libelle" loading="lazy" onerror="this.style.display=''none''; this.nextElementSibling.style.display=''flex''" />
+        <img src="@Model.ImageUrl" class="card-img-top" alt="@Model.Libelle" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'" />
         <div class="w-100 h-100 d-none align-items-center justify-content-center" style="background: linear-gradient(135deg, var(--primary-50), var(--accent-gold-light)); min-height:200px;">
             <i class="fas fa-hamburger fa-2x" style="color:var(--primary)"></i>
         </div>
@@ -61,3 +61,4 @@
         </form>
     </div>
 </div>
+

@@ -33,14 +33,14 @@
                     <div class="card-header d-flex justify-content-between align-items-center">
                         <strong>Produits (@Model.TotalItems articles)</strong>
                         <form asp-action="Clear" method="post" class="m-0">
-                            <button type="submit" class="btn btn-sm btn-outline-secondary" style="border-radius:999px;" onclick="return confirm(''Vider le panier ?'')"><i class="fas fa-trash me-1"></i> Vider</button>
+                            <button type="submit" class="btn btn-sm btn-outline-secondary" style="border-radius:999px;" onclick="return confirm('Vider le panier ?')"><i class="fas fa-trash me-1"></i> Vider</button>
                         </form>
                     </div>
                     <div class="card-body p-0">
                         @foreach (var item in Model.Items)
                         {
                             <div class="d-flex gap-3 p-3 align-items-center" style="border-bottom:1px solid var(--gray-100);">
-                                <img src="@item.ImageUrl" alt="@item.Libelle" style="width:84px; height:84px; border-radius:12px; object-fit:cover; background:var(--gray-50); flex-shrink:0;" onerror="this.style.display=''none''" />
+                                <img src="@item.ImageUrl" alt="@item.Libelle" style="width:84px; height:84px; border-radius:12px; object-fit:cover; background:var(--gray-50); flex-shrink:0;" onerror="this.style.display='none'" />
                                 <div class="flex-fill" style="min-width:0;">
                                     <div class="fw-bold" style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">@item.Libelle</div>
                                     <div class="text-muted" style="font-size:0.85rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">@item.Description</div>
@@ -49,9 +49,9 @@
                                         <form asp-action="Update" method="post" class="d-flex align-items-center gap-1">
                                             <input type="hidden" name="productId" value="@item.ProductId" />
                                             <div class="quantity-selector" style="padding:0.2rem;">
-                                                <button type="button" class="qty-btn" style="width:28px; height:28px;" onclick="this.nextElementSibling.stepDown(); this.nextElementSibling.dispatchEvent(new Event(''change''))">−</button>
+                                                <button type="button" class="qty-btn" style="width:28px; height:28px;" onclick="this.nextElementSibling.stepDown(); this.nextElementSibling.dispatchEvent(new Event('change'))">−</button>
                                                 <input type="number" name="quantity" value="@item.Quantite" min="1" max="20" class="border-0 bg-transparent text-center" style="width:40px; font-weight:700;" onchange="this.form.submit()">
-                                                <button type="button" class="qty-btn" style="width:28px; height:28px;" onclick="this.previousElementSibling.stepUp(); this.previousElementSibling.dispatchEvent(new Event(''change''))">+</button>
+                                                <button type="button" class="qty-btn" style="width:28px; height:28px;" onclick="this.previousElementSibling.stepUp(); this.previousElementSibling.dispatchEvent(new Event('change'))">+</button>
                                             </div>
                                         </form>
                                         <span class="ms-auto fw-bold" style="color:var(--neutral-900)">@item.SousTotal.ToString("N0") FCFA</span>
@@ -95,3 +95,4 @@
         </div>
     }
 </div>
+
