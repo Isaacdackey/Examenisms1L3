@@ -60,8 +60,8 @@
   --transition-fast: all 0.15s ease;
   --transition-slow: all 0.5s cubic-bezier(0.16,1,0.3,1);
   /* Typo */
-  --font-main: ''Poppins'', ''Segoe UI'', system-ui, -apple-system, sans-serif;
-  --font-display: ''Poppins'', sans-serif;
+  --font-main: 'Poppins', 'Segoe UI', system-ui, -apple-system, sans-serif;
+  --font-display: 'Poppins', sans-serif;
 }
 
 /* ========== 2. BASE ========== */
@@ -200,7 +200,7 @@ img { max-width:100%; }
 .card:hover { box-shadow: var(--box-shadow-md); }
 .card-header { background: var(--white); border-bottom:1px solid var(--gray-100); padding:1.1rem 1.4rem; font-weight:700; }
 .product-card { height:100%; position:relative; display:flex; flex-direction:column; }
-.product-card::before { content:''''; position:absolute; top:0; left:0; right:0; height:3px; background: linear-gradient(90deg, var(--primary), var(--accent-gold)); opacity:0; transition: var(--transition); z-index:2; }
+.product-card::before { content: ''; position:absolute; top:0; left:0; right:0; height:3px; background: linear-gradient(90deg, var(--primary), var(--accent-gold)); opacity:0; transition: var(--transition); z-index:2; }
 .product-card:hover::before { opacity:1; }
 .product-card:hover { transform: translateY(-4px); box-shadow: var(--box-shadow-lg); }
 .product-card .img-wrap { position:relative; overflow:hidden; background: var(--gray-50); aspect-ratio: 1.2; }
@@ -238,12 +238,12 @@ img { max-width:100%; }
   margin-bottom:2rem;
 }
 .hero-section::before {
-  content:''''; position:absolute; inset:-20%;
+  content: ''; position:absolute; inset:-20%;
   background: radial-gradient(circle at 30% 20%, rgba(255,255,255,0.18) 0%, transparent 50%),
               radial-gradient(circle at 80% 80%, rgba(251,191,36,0.25) 0%, transparent 40%);
 }
 .hero-section::after {
-  content:''''; position:absolute; bottom:-1px; left:0; right:0; height:24px;
+  content: ''; position:absolute; bottom:-1px; left:0; right:0; height:24px;
   background: var(--neutral-50); border-radius: 24px 24px 0 0;
 }
 .hero-title { color:var(--white); text-shadow: 0 2px 20px rgba(0,0,0,0.15); margin-bottom:0.75rem; }
@@ -339,8 +339,8 @@ img { max-width:100%; }
 .stepper .step::before { counter-increment: step; content: counter(step); width:36px; height:36px; display:grid; place-items:center; margin:0 auto 0.5rem; border-radius:50%; background: var(--gray-100); color: var(--gray-500); font-weight:700; border:2px solid var(--gray-200); transition: var(--transition-fast); }
 .stepper .step.active { color: var(--primary); }
 .stepper .step.active::before { background: var(--primary); color:var(--white); border-color: var(--primary); box-shadow: var(--box-shadow-orange); }
-.stepper .step.completed::before { background: var(--success); border-color: var(--success); color:var(--white); content: ''\2713''; }
-.stepper .step:not(:last-child)::after { content:''''; position:absolute; top:22px; left:60%; right:-40%; height:2px; background: var(--gray-200); }
+.stepper .step.completed::before { background: var(--success); border-color: var(--success); color:var(--white); content: '\2713'; }
+.stepper .step:not(:last-child)::after { content: ''; position:absolute; top:22px; left:60%; right:-40%; height:2px; background: var(--gray-200); }
 .stepper .step.completed::after { background: var(--success); }
 
 /* Payment options */
@@ -368,7 +368,7 @@ img { max-width:100%; }
   position:relative;
   overflow:hidden;
 }
-.footer::before { content:''''; position:absolute; top:0; left:0; right:0; height:1px; background: linear-gradient(90deg, transparent, rgba(249,115,22,0.5), transparent); }
+.footer::before { content: ''; position:absolute; top:0; left:0; right:0; height:1px; background: linear-gradient(90deg, transparent, rgba(249,115,22,0.5), transparent); }
 .footer h5 { color: var(--white); font-weight:700; font-size:1.05rem; margin-bottom:1rem; letter-spacing:-0.01em; }
 .footer h5 i { color: var(--primary); }
 .footer a { color: rgba(255,255,255,0.65); font-size:0.92rem; padding:0.3rem 0; display:block; }
@@ -426,4 +426,5 @@ img { max-width:100%; }
 
 .quantity-selector input{ flex:0 0 56px; }
 .quantity-selector input::-webkit-outer-spin-button, .quantity-selector input::-webkit-inner-spin-button{ -webkit-appearance:none; margin:0; }
+
 

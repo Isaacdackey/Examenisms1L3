@@ -16,10 +16,24 @@
             <div class="col-12">
                 <div class="card">
                     <div class="card-body d-flex flex-wrap align-items-center gap-3">
-                        <div><div class="fw-bold">#BB-@c.Id</div><small class="text-muted">@c.CreatedAt.ToString("dd/MM/yyyy HH:mm") • @c.TypeRetrait</small></div>
-                        <span class="badge" style="background:var(--gray-100); color:var(--gray-700); border:1px solid var(--gray-200); border-radius:999px;">@c.Statut</span>
+                        <div><div class="fw-bold">#@(c.Numero ?? "BB-" + c.Id)</div><small class="text-muted">@c.CreatedAt.ToString("dd/MM/yyyy HH:mm") • @GetTypeRetraitDisplay(c.TypeRetrait)</small></div>
+                        <span class="badge" style="@GetStatusStyle(c.Statut) border:1px solid rgba(0,0,0,0.06); border-radius:999px; padding:0.45rem 0.75rem; font-weight:700; font-size:0.76rem;">@c.StatutDisplay</span>
                         <span class="ms-auto fw-bold" style="color:var(--neutral-900)">@c.MontantTotal.ToString("N0") FCFA</span>
-                        <a href="@Url.Action("Details", "Order", new { id = c.Id })" class="btn btn-outline-primary btn-sm" style="border-radius:999px;">Détails <i class="fas fa-chevron-right ms-1"></i></a>
+                        <div class="d-flex gap-2">
+                            <a href="@Url.Action("Details", "Order", new { id = c.Id })" class="btn btn-outline-primary btn-sm" style="border-radius:999px;"><i class="fas fa-eye"></i> Détails</a>
+                            @if (CanCancel(c.Statut))
+                            {
+                                <form asp-action="Cancel" asp-controller="Order" method="post" class="d-inline">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="id" value="@c.Id" />
+                                    <button type="submit" class="btn btn-sm" style="background:var(--danger-light); color:var(--danger); border:1px solid #fecaca; border-radius:999px; font-weight:700;" onclick="return confirm(''Êtes-vous sûr de vouloir annuler cette commande ?')"><i class="fas fa-times me-1"></i> Annuler</button>
+                                </form>
+                            }
+                            @if (c.Statut == "EN_ATTENTE")
+                            {
+                                <a href="@Url.Action("Payment", "Order", new { orderId = c.Id })" class="btn btn-success btn-sm" style="border-radius:999px;"><i class="fas fa-credit-card"></i> Payer</a>
+                            }
+                        </div>
                     </div>
                 </div>
             </div>
@@ -27,3 +41,26 @@
         </div>
     }
 </div>
+@functions{
+    string GetStatusStyle(string statut){
+        return statut switch{
+            "EN_ATTENTE" => "background:var(--primary-50); color:var(--primary-dark);",
+            "VALIDEE" => "background:#eff6ff; color:#1d4ed8;",
+            "EN_PREPARATION" => "background:#eff6ff; color:#1d4ed8;",
+            "PRETE" => "background:var(--accent-gold-light); color:#92400e;",
+            "EN_LIVRAISON" => "background:#eff6ff; color:#1d4ed8;",
+            "LIVREE" => "background:var(--success-light); color:#166534;",
+            "TERMINEE" => "background:var(--success-light); color:#166534;",
+            "PAYE" => "background:var(--success-light); color:#166534;",
+            "ANNULEE" => "background:var(--danger-light); color:#991b1b;",
+            _ => "background:var(--gray-100); color:var(--gray-700);"
+        };
+    }
+    string GetTypeRetraitDisplay(string t) => t switch{
+        "SUR_PLACE" => "Sur place",
+        "A_EMPORTER" => "À emporter",
+        "LIVRAISON" => "Livraison",
+        _ => t
+    };
+    bool CanCancel(string statut) => statut == "EN_ATTENTE" || statut == "VALIDEE";
+}

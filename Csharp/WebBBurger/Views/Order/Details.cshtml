@@ -3,10 +3,10 @@
     ViewData["Title"] = $"Commande #{Model.Id} - Brasil Burger";
 }
 <div class="container py-4">
-    <div class="d-flex align-items-center gap-3 mb-4">
+    <div class="d-flex align-items-center gap-3 mb-4 flex-wrap">
         <a href="@Url.Action("History", "Order")" class="btn btn-outline-secondary btn-sm" style="border-radius:999px;"><i class="fas fa-arrow-left"></i></a>
         <h1 class="h4 mb-0">Commande <span style="color:var(--primary)">#@(Model.Numero ?? "BB-" + Model.Id)</span></h1>
-        <span class="badge ms-2" style="background:var(--gray-100); color:var(--gray-700); border:1px solid var(--gray-200); border-radius:999px; padding:0.5rem 0.85rem;">@Model.StatutDisplay</span>
+        <span class="badge" style="@GetStatusStyle(Model.Statut) border:1px solid rgba(0,0,0,0.06); border-radius:999px; padding:0.5rem 0.85rem; font-weight:700;">@Model.StatutDisplay</span>
         <span class="ms-auto fw-bold">@Model.MontantTotal.ToString("N0") FCFA</span>
     </div>
     <div class="row g-4">
@@ -41,11 +41,35 @@
                 <h6 class="fw-bold mb-3">Recapitulatif</h6>
                 <div class="summary-line"><span>Sous-total</span><span>@Model.MontantTotal.ToString("N0") FCFA</span></div>
                 <div class="summary-line total"><span>Total paye</span><span>@Model.MontantTotal.ToString("N0") FCFA</span></div>
-                @if (Model.Statut != "TERMINEE" && Model.Statut != "ANNULEE"){
-                    <div class="d-grid mt-3"><a asp-action="Payment" asp-route-id="@Model.Id" class="btn btn-primary"><i class="fas fa-credit-card"></i> Payer</a></div>
-                }
-                <a href="@Url.Action("History", "Order")" class="btn btn-outline-secondary w-100 mt-2" style="border-radius:999px;">Historique</a>
+                <div class="d-grid gap-2 mt-3">
+                    @if (Model.Statut != "TERMINEE" && Model.Statut != "ANNULEE" && Model.Statut != "LIVREE" && Model.Statut != "PAYE"){
+                        <a asp-action="Payment" asp-route-id="@Model.Id" asp-controller="Order" class="btn btn-primary"><i class="fas fa-credit-card"></i> Payer</a>
+                    }
+                    @if (CanCancel(Model.Statut)){
+                        <form asp-action="Cancel" asp-controller="Order" method="post" class="d-grid">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="id" value="@Model.Id" />
+                            <button type="submit" class="btn" style="background:var(--danger-light); color:var(--danger); border:1.5px solid #fecaca; border-radius:999px; font-weight:700;" onclick="return confirm(''Êtes-vous sûr de vouloir annuler cette commande ?')"><i class="fas fa-times me-1"></i> Annuler la commande</button>
+                        </form>
+                    }
+                    <a href="@Url.Action("History", "Order")" class="btn btn-outline-secondary" style="border-radius:999px;">Historique</a>
+                </div>
             </div>
         </div>
     </div>
 </div>
+@functions{
+    string GetStatusStyle(string s) => s switch{
+        "EN_ATTENTE" => "background:var(--primary-50); color:var(--primary-dark);",
+        "VALIDEE" => "background:#eff6ff; color:#1d4ed8;",
+        "EN_PREPARATION" => "background:#eff6ff; color:#1d4ed8;",
+        "PRETE" => "background:var(--accent-gold-light); color:#92400e;",
+        "EN_LIVRAISON" => "background:#eff6ff; color:#1d4ed8;",
+        "LIVREE" => "background:var(--success-light); color:#166534;",
+        "TERMINEE" => "background:var(--success-light); color:#166534;",
+        "PAYE" => "background:var(--success-light); color:#166534;",
+        "ANNULEE" => "background:var(--danger-light); color:#991b1b;",
+        _ => "background:var(--gray-100); color:var(--gray-700);"
+    };
+    bool CanCancel(string s) => s == "EN_ATTENTE" || s == "VALIDEE";
+}

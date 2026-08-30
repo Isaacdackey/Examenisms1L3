@@ -13,7 +13,7 @@
     } else {
         <div class="row g-3">@foreach(var c in Model.OrderByDescending(x=>x.CreatedAt)){
             <div class="col-md-6 col-lg-4"><div class="card h-100"><div class="card-body">
-                <div class="d-flex justify-content-between align-items-start mb-2"><strong>#BB-@c.Id</strong><span class="badge" style="background:var(--primary-50); color:var(--primary-dark); border:1px solid var(--primary-100); border-radius:999px;">@c.Statut</span></div>
+                <div class="d-flex justify-content-between align-items-start mb-2"><strong>#BB-@c.Id</strong><span class="badge" style="@GetStatusStyle(c.Statut) border:1px solid rgba(0,0,0,0.06); border-radius:999px;">@c.StatutDisplay</span></div>
                 <small class="text-muted">@c.CreatedAt.ToString("dd/MM/yyyy") • @c.TypeRetrait</small>
                 <div class="fw-bold mt-2">@c.MontantTotal.ToString("N0") FCFA</div>
                 <a href="@Url.Action("Details", "Order", new { id = c.Id })" class="btn btn-outline-primary btn-sm w-100 mt-3" style="border-radius:999px;">Voir détails</a>
@@ -21,3 +21,14 @@
         }</div>
     }
 </div>
+
+@functions{
+    string GetStatusStyle(string s) => s switch{
+        "EN_ATTENTE" => "background:var(--primary-50); color:var(--primary-dark);",
+        "VALIDEE" => "background:#eff6ff; color:#1d4ed8;",
+        "ANNULEE" => "background:var(--danger-light); color:#991b1b;",
+        "TERMINEE" => "background:var(--success-light); color:#166534;",
+        "LIVREE" => "background:var(--success-light); color:#166534;",
+        _ => "background:var(--gray-100); color:var(--gray-700);"
+    };
+}

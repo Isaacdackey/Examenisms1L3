@@ -6,17 +6,37 @@
 <div class="container py-4">
     <div class="stepper mb-4"><div class="step completed">Panier</div><div class="step completed">Livraison</div><div class="step active">Paiement</div></div>
     <div class="row justify-content-center"><div class="col-lg-7">
-        <div class="card text-center">
-            <div class="card-body p-5">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <strong><i class="fas fa-credit-card me-2" style="color:var(--primary)"></i> Paiement commande #@(Model.Numero ?? "BB-" + Model.Id)</strong>
+                <span class="badge" style="@GetStatusStyle(Model.Statut) border:1px solid rgba(0,0,0,0.06); border-radius:999px; padding:0.4rem 0.7rem;">@Model.StatutDisplay</span>
+            </div>
+            <div class="card-body p-4 text-center">
                 <div style="width:64px; height:64px; background:var(--primary-50); color:var(--primary); border-radius:50%; display:grid; place-items:center; margin:0 auto 1rem; font-size:1.5rem;"><i class="fas fa-credit-card"></i></div>
-                <h3>Paiement commande #@Model.Id</h3>
-                <p class="text-muted">Montant à régler</p>
+                <h3>Paiement commande #@(Model.Numero ?? Model.Id.ToString())</h3>
+                <p class="text-muted">Montant a regler</p>
                 <div class="display-6 fw-bold mb-4" style="color:var(--neutral-900)">@total.ToString("N0") FCFA</div>
                 <div class="d-grid gap-2">
-                    <a asp-action="PaymentSelection" asp-route-id="@Model.Id" class="btn btn-primary btn-lg"><i class="fas fa-arrow-right"></i> Choisir le mode de paiement</a>
-                    <a asp-action="Details" asp-route-id="@Model.Id" class="btn btn-outline-secondary" style="border-radius:999px;">Voir la commande</a>
+                    <a asp-action="Payment" asp-controller="Order" asp-route-orderId="@Model.Id" class="btn btn-primary btn-lg"><i class="fas fa-arrow-right"></i> Choisir le mode de paiement</a>
+                    <a asp-action="Details" asp-route-id="@Model.Id" asp-controller="Order" class="btn btn-outline-secondary" style="border-radius:999px;">Voir la commande</a>
+                    @if (CanCancel(Model.Statut)){
+                        <form asp-action="Cancel" asp-controller="Order" method="post" class="d-grid mt-2">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="id" value="@Model.Id" />
+                            <button type="submit" class="btn" style="background:var(--danger-light); color:var(--danger); border:1.5px solid #fecaca; border-radius:999px; font-weight:700;" onclick="return confirm(''Êtes-vous sûr de vouloir annuler cette commande ?')"><i class="fas fa-times me-1"></i> Annuler la commande</button>
+                        </form>
+                    }
                 </div>
             </div>
         </div>
     </div></div>
 </div>
+@functions{
+    string GetStatusStyle(string s) => s switch{
+        "EN_ATTENTE" => "background:var(--primary-50); color:var(--primary-dark);",
+        "VALIDEE" => "background:#eff6ff; color:#1d4ed8;",
+        "ANNULEE" => "background:var(--danger-light); color:#991b1b;",
+        _ => "background:var(--gray-100); color:var(--gray-700);"
+    };
+    bool CanCancel(string s) => s == "EN_ATTENTE" || s == "VALIDEE";
+}
