@@ -7,7 +7,7 @@
 
     string heroTitle = "Le Goût du Brésil";
     string heroSubtitle = "Burgers artisanaux, menus généreux et compléments irrésistibles — préparés à la commande à Dakar.";
-    string pageTitle = "Catalogue";
+    // pageTitle removed - use heroTitle
     if (!string.IsNullOrEmpty(typeParam))
     {
         heroTitle = typeParam.ToLower() switch
@@ -239,3 +239,4 @@ else
         });
     </script>
 }
+

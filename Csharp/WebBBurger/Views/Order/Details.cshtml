@@ -5,8 +5,8 @@
 <div class="container py-4">
     <div class="d-flex align-items-center gap-3 mb-4">
         <a href="@Url.Action("History", "Order")" class="btn btn-outline-secondary btn-sm" style="border-radius:999px;"><i class="fas fa-arrow-left"></i></a>
-        <h1 class="h4 mb-0">Commande <span style="color:var(--primary)">#BB-@Model.Id</span></h1>
-        <span class="badge ms-2" style="background:var(--gray-100); color:var(--gray-700); border:1px solid var(--gray-200); border-radius:999px; padding:0.5rem 0.85rem;">@Model.Statut</span>
+        <h1 class="h4 mb-0">Commande <span style="color:var(--primary)">#@(Model.Numero ?? "BB-" + Model.Id)</span></h1>
+        <span class="badge ms-2" style="background:var(--gray-100); color:var(--gray-700); border:1px solid var(--gray-200); border-radius:999px; padding:0.5rem 0.85rem;">@Model.StatutDisplay</span>
         <span class="ms-auto fw-bold">@Model.MontantTotal.ToString("N0") FCFA</span>
     </div>
     <div class="row g-4">
@@ -14,12 +14,15 @@
             <div class="card mb-4">
                 <div class="card-header"><i class="fas fa-list me-2" style="color:var(--primary)"></i> Articles</div>
                 <div class="card-body p-0">
-                    @if (Model.Lignes != null){ foreach(var l in Model.Lignes){
+                    @if (Model.LigneCommandes != null && Model.LigneCommandes.Any()){
+                        foreach(var l in Model.LigneCommandes){
                         <div class="d-flex justify-content-between p-3" style="border-bottom:1px solid var(--gray-100);">
-                            <div><strong>@l.Produit?.Libelle</strong> <span class="text-muted">× @l.Quantite</span><div class="text-muted" style="font-size:0.85rem;">@l.Produit?.Description</div></div>
-                            <strong>@((l.Prix * l.Quantite).ToString("N0")) FCFA</strong>
+                            <div><strong>@l.Produit?.Libelle</strong> <span class="text-muted">x @l.Quantite</span><div class="text-muted" style="font-size:0.85rem;">@l.Produit?.Description</div></div>
+                            <strong>@((l.PrixUnitaire * l.Quantite).ToString("N0")) FCFA</strong>
                         </div>
-                    }}
+                    }} else {
+                        <div class="p-4 text-muted text-center">Aucune ligne</div>
+                    }
                 </div>
             </div>
             <div class="card">
@@ -27,16 +30,17 @@
                 <div class="card-body" style="font-size:0.92rem;">
                     <p class="mb-1"><i class="fas fa-map-marker-alt me-2" style="color:var(--primary)"></i> @Model.Adresse</p>
                     <p class="mb-1"><i class="fas fa-box me-2" style="color:var(--primary)"></i> Type : @Model.TypeRetrait</p>
-                    @if (Model.ZoneLivraison != null){ <p class="mb-1"><i class="fas fa-map me-2"></i> Zone : @Model.ZoneLivraison.Nom (+@Model.ZoneLivraison.PrixLivraison.ToString("N0") FCFA)</p> }
+                    @if (Model.Zone != null){ <p class="mb-1"><i class="fas fa-map me-2"></i> Zone : @Model.Zone.Nom (+@Model.Zone.PrixLivraison.ToString("N0") FCFA)</p> }
+                    @if (!string.IsNullOrEmpty(Model.Notes)){ <p class="mb-1"><i class="fas fa-sticky-note me-2"></i> Notes : @Model.Notes</p> }
                     <p class="mb-0"><i class="fas fa-credit-card me-2" style="color:var(--primary)"></i> Paiement : @Model.MoyenPaiement</p>
                 </div>
             </div>
         </div>
         <div class="col-lg-4">
             <div class="cart-summary">
-                <h6 class="fw-bold mb-3">Récapitulatif</h6>
+                <h6 class="fw-bold mb-3">Recapitulatif</h6>
                 <div class="summary-line"><span>Sous-total</span><span>@Model.MontantTotal.ToString("N0") FCFA</span></div>
-                <div class="summary-line total"><span>Total payé</span><span>@Model.MontantTotal.ToString("N0") FCFA</span></div>
+                <div class="summary-line total"><span>Total paye</span><span>@Model.MontantTotal.ToString("N0") FCFA</span></div>
                 @if (Model.Statut != "TERMINEE" && Model.Statut != "ANNULEE"){
                     <div class="d-grid mt-3"><a asp-action="Payment" asp-route-id="@Model.Id" class="btn btn-primary"><i class="fas fa-credit-card"></i> Payer</a></div>
                 }

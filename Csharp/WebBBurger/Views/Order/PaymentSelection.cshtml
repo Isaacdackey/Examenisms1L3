@@ -8,25 +8,52 @@
         <div class="card">
             <div class="card-header d-flex align-items-center gap-2"><i class="fas fa-credit-card" style="color:var(--primary)"></i> <strong>Choisir un moyen de paiement</strong></div>
             <div class="card-body">
-                <form asp-action="ProcessPayment" method="post">
-                    @Html.AntiForgeryToken()
-                    <input type="hidden" asp-for="CommandeId" />
-                    <div class="row g-3 mb-4">
-                        <div class="col-6 col-md-3"><label class="payment-option w-100 h-100 text-center" style="flex-direction:column;"><input type="radio" asp-for="MoyenPaiement" value="WAVE" id="psWave" style="position:absolute; opacity:0;"><div class="payment-icon wave mx-auto">W</div><span class="fw-bold">Wave</span><small class="text-muted d-block">Mobile money</small></label></div>
-                        <div class="col-6 col-md-3"><label class="payment-option w-100 h-100 text-center" style="flex-direction:column;"><input type="radio" asp-for="MoyenPaiement" value="ORANGE_MONEY" id="psOM" style="position:absolute; opacity:0;"><div class="payment-icon orange mx-auto">OM</div><span class="fw-bold">Orange Money</span></label></div>
-                        <div class="col-6 col-md-3"><label class="payment-option w-100 h-100 text-center" style="flex-direction:column;"><input type="radio" asp-for="MoyenPaiement" value="CARTE" id="psCarte" style="position:absolute; opacity:0;"><div class="payment-icon card mx-auto"><i class="fas fa-credit-card"></i></div><span class="fw-bold">Carte</span></label></div>
-                        <div class="col-6 col-md-3"><label class="payment-option w-100 h-100 text-center" style="flex-direction:column;"><input type="radio" asp-for="MoyenPaiement" value="ESPECES" id="psEspeces" style="position:absolute; opacity:0;"><div class="payment-icon cash mx-auto"><i class="fas fa-money-bill-wave"></i></div><span class="fw-bold">Espèces</span></label></div>
+                <div class="alert alert-info mb-4">
+                    <h5><i class="fas fa-receipt"></i> Commande #@Model.NumeroCommande</h5>
+                    <p class="mb-0">Montant a payer : <strong>@Model.Total.ToString("N0") FCFA</strong></p>
+                </div>
+                <div class="row g-3 mb-4">
+                    <div class="col-md-6">
+                        <div class="card h-100 text-center">
+                            <div class="card-body">
+                                <div class="mb-3"><i class="fas fa-mobile-alt fa-3x" style="color:var(--success)"></i></div>
+                                <h5>Wave</h5><p class="text-muted small">Paiement mobile rapide</p>
+                                <a href="@Url.Action("SimulatePayment", "Order", new { orderId = Model.CommandeId })" class="btn btn-outline-success"><i class="fas fa-hand-holding-usd"></i> Payer Par Wave</a>
+                            </div>
+                        </div>
                     </div>
-                    <span asp-validation-for="MoyenPaiement" class="text-danger"></span>
-                    <div class="cart-summary mt-4" style="position:static;">
-                        <div class="d-flex justify-content-between mb-2"><span>Commande #@Model.CommandeId</span><strong>@Model.Montant.ToString("N0") FCFA</strong></div>
-                        <div class="d-grid"><button type="submit" class="btn btn-primary btn-lg"><i class="fas fa-lock"></i> Payer maintenant</button></div>
-                        <a href="@Url.Action("Details", "Order", new { id = Model.CommandeId })" class="btn btn-outline-secondary w-100 mt-2" style="border-radius:999px;">← Retour</a>
+                    <div class="col-md-6">
+                        <div class="card h-100 text-center">
+                            <div class="card-body">
+                                <div class="mb-3"><i class="fas fa-mobile-alt fa-3x" style="color:var(--warning)"></i></div>
+                                <h5>Orange Money</h5><p class="text-muted small">Via Orange Money</p>
+                                <a href="@Url.Action("SimulatePayment", "Order", new { orderId = Model.CommandeId })" class="btn btn-outline-success"><i class="fas fa-hand-holding-usd"></i> Payer par Orange Money</a>
+                            </div>
+                        </div>
                     </div>
-                </form>
+                    <div class="col-md-6">
+                        <div class="card h-100 text-center">
+                            <div class="card-body">
+                                <div class="mb-3"><i class="fas fa-credit-card fa-3x text-primary"></i></div>
+                                <h5>Carte Bancaire</h5><p class="text-muted small">Paiement securise</p>
+                                <a href="@Url.Action("SimulatePayment", "Order", new { orderId = Model.CommandeId })" class="btn btn-outline-success"><i class="fas fa-hand-holding-usd"></i> Payer Par Carte</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card h-100 text-center">
+                            <div class="card-body">
+                                <div class="mb-3"><i class="fas fa-money-bill-wave fa-3x text-success"></i></div>
+                                <h5>Especes</h5><p class="text-muted small">A la livraison / sur place</p>
+                                <a href="@Url.Action("SimulatePayment", "Order", new { orderId = Model.CommandeId })" class="btn btn-outline-success"><i class="fas fa-hand-holding-usd"></i> Simuler paiement especes</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="d-grid gap-2 d-md-flex justify-content-md-between">
+                    <a href="@Url.Action("Details", "Order", new { id = Model.CommandeId })" class="btn btn-outline-secondary"><i class="fas fa-arrow-left"></i> Retour aux details</a>
+                </div>
             </div>
         </div>
     </div></div>
 </div>
-@section Scripts { <partial name="_ValidationScriptsPartial" />
-<script>$(function(){$(''input[name="MoyenPaiement"]'').on(''change'', function(){ $(''.payment-option'').removeClass(''selected''); $(this).closest(''.payment-option'').addClass(''selected''); });});</script> }
