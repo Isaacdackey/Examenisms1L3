@@ -102,7 +102,7 @@
                                 <label asp-for="Quantity" class="form-label fw-bold">Quantité</label>
                                 <div class="quantity-selector">
                                     <button type="button" class="qty-btn" onclick="changeQuantity(-1)">−</button>
-                                    <input asp-for="Quantity" class="form-control text-center border-0 bg-transparent" style="width:60px; font-weight:800;" min="1" max="10" id="quantityInput" readonly />
+                                    <input asp-for="Quantity" class="text-center" style="width:56px; font-weight:800; font-size:1.15rem; border:none; background:transparent; text-align:center; appearance:textfield; -moz-appearance:textfield;" min="1" max="10" id="quantityInput" readonly />
                                     <button type="button" class="qty-btn" onclick="changeQuantity(1)">+</button>
                                 </div>
                                 <span asp-validation-for="Quantity" class="text-danger small"></span>
@@ -147,3 +147,4 @@
         });
     </script>
 }
+
