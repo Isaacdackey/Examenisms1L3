@@ -1,50 +1,31 @@
-@model WebBBurger.Models.ViewModels.SimulatePaymentViewModel
+﻿@model WebBBurger.Models.ViewModels.SimulatePaymentViewModel
 @{
-    ViewData["Title"] = "Simulation de paiement - Brasil Burger";
+    ViewData["Title"] = "Paiement sécurisé - Brasil Burger";
 }
-
-<div class="container mt-4">
-    <div class="row justify-content-center">
-        <div class="col-md-6">
-            <div class="card">
-                <div class="card-header bg-success text-white">
-                    <h4 class="mb-0">Simulation de Paiement</h4>
-                </div>
-                <div class="card-body">
-                    <div class="alert alert-info">
-                        <i class="fas fa-info-circle"></i> 
-                        Mode simulation activé. En production, vous seriez redirigé vers une passerelle de paiement.
+<div class="container py-5">
+    <div class="row justify-content-center"><div class="col-md-6">
+        <div class="card overflow-hidden">
+            <div class="card-header text-center" style="background:var(--neutral-900); color:var(--white); padding:1.5rem;">
+                <div style="width:48px; height:48px; background:var(--primary); border-radius:50%; display:grid; place-items:center; margin:0 auto 0.5rem;"><i class="fas fa-lock"></i></div>
+                <h4 class="mb-1" style="color:var(--white)">Paiement sécurisé</h4>
+                <p class="mb-0" style="color:rgba(255,255,255,0.7); font-size:0.9rem;">Simulation • @Model.MoyenPaiement • @Model.Montant.ToString("N0") FCFA</p>
+            </div>
+            <div class="card-body p-4">
+                <form asp-action="SimulatePayment" method="post">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" asp-for="CommandeId" />
+                    <input type="hidden" asp-for="MoyenPaiement" />
+                    <input type="hidden" asp-for="Montant" />
+                    <div class="alert alert-info"><i class="fas fa-info-circle me-1"></i> Ceci est une simulation. Aucun vrai débit ne sera effectué.</div>
+                    <div class="mb-3"><label asp-for="Telephone" class="form-label">Numéro @Model.MoyenPaiement</label><input asp-for="Telephone" class="form-control" placeholder="77 123 45 67" /><span asp-validation-for="Telephone" class="text-danger small"></span></div>
+                    <div class="mb-4"><label asp-for="Code" class="form-label">Code de confirmation (optionnel)</label><input asp-for="Code" class="form-control" placeholder="0000" /></div>
+                    <div class="d-grid gap-2">
+                        <button type="submit" name="action" value="success" class="btn btn-success btn-lg"><i class="fas fa-check-circle"></i> Simuler succès</button>
+                        <button type="submit" name="action" value="fail" class="btn btn-outline-secondary" style="border-radius:999px;"><i class="fas fa-times"></i> Simuler échec</button>
                     </div>
-                    
-                    <div class="mb-4">
-                        <h5>Commande @Model.OrderNumber</h5>
-                        <p><strong>Montant :</strong> @Model.Total.ToString("C0") FCFA</p>
-                        <p><strong>Méthode :</strong> @(Model.PaymentMethod == "EN_LIGNE" ? "Paiement en ligne" : "Paiement en espèces")</p>
-                    </div>
-                    
-                    <form method="post" action="@Url.Action("SimulatePaymentConfirmed", "Order")">
-                        @Html.AntiForgeryToken()
-                        <input type="hidden" name="orderId" value="@Model.OrderId" />
-                        <input type="hidden" name="paymentMethod" value="@Model.PaymentMethod" />
-                        
-                        <div class="d-grid gap-2">
-                            <button type="submit" class="btn btn-success btn-lg">
-                                <i class="fas fa-check-circle"></i> Simuler un paiement réussi
-                            </button>
-                            
-                            <a href="@Url.Action("Details", "Order", new { id = Model.OrderId })" 
-                               class="btn btn-outline-secondary">
-                                <i class="fas fa-times"></i> Retour aux détails
-                            </a>
-                            
-                            <a href="@Url.Action("PaymentFailed", "Order", new { orderId = Model.OrderId })" 
-                               class="btn btn-danger">
-                                <i class="fas fa-times-circle"></i> Simuler un échec de paiement
-                            </a>
-                        </div>
-                    </form>
-                </div>
+                </form>
             </div>
         </div>
-    </div>
+    </div></div>
 </div>
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

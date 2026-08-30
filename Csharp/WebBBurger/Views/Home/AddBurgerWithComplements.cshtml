@@ -1,4 +1,4 @@
-@using WebBBurger.Models.ViewModels
+﻿@using WebBBurger.Models.ViewModels
 @model WebBBurger.Models.ViewModels.BurgerDetailsViewModel
 @{
     var libelle = Model?.Libelle ?? "Burger";
@@ -10,86 +10,54 @@
     var tempsPreparation = Model?.TempsPreparation;
     var boissons = Model?.Boissons ?? new List<ProductViewModel>();
     var frites = Model?.Frites ?? new List<ProductViewModel>();
-    
     ViewData["Title"] = $"{libelle} - Brasil Burger";
 }
-
-<div class="container mt-4">
-    <div class="row">
-        <div class="col-md-6">
-            <div class="card">
+<div class="container py-4">
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb" style="background:transparent; padding:0; margin:0; font-size:0.88rem;">
+            <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index" style="color:var(--gray-500)">Catalogue</a></li>
+            <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Details" asp-route-id="@Model?.Id" style="color:var(--gray-500)">@libelle</a></li>
+            <li class="breadcrumb-item active" style="color:var(--neutral-900); font-weight:600;">Personnaliser</li>
+        </ol>
+    </nav>
+    <div class="row g-4">
+        <div class="col-lg-6">
+            <div class="card overflow-hidden">
                 @if (!string.IsNullOrEmpty(imageUrl))
                 {
-                    <img src="@imageUrl" class="card-img-top" alt="@libelle" 
-                         style="height: 400px; object-fit: cover;">
+                    <div class="img-wrap" style="aspect-ratio:1.15;"><img src="@imageUrl" alt="@libelle" style="width:100%; height:100%; object-fit:cover;" /></div>
                 }
                 else
                 {
-                    <div class="card-img-top bg-light d-flex align-items-center justify-content-center" 
-                         style="height: 400px;">
-                        <i class="fas fa-hamburger fa-5x text-muted"></i>
-                    </div>
+                    <div class="d-flex align-items-center justify-content-center" style="height:340px; background: linear-gradient(135deg, var(--primary-50), var(--accent-gold-light));"><i class="fas fa-hamburger fa-4x" style="color:var(--primary)"></i></div>
                 }
                 <div class="card-body">
-                    <h1 class="card-title">@libelle</h1>
-                    <h3 class="text-primary">@prix.ToString("C0") FCFA</h3>
-                    @if (!string.IsNullOrEmpty(description))
+                    <span class="product-badge badge-burger" style="position:static;"><i class="fas fa-hamburger"></i> Burger</span>
+                    <h1 class="h3 mt-2 mb-1">@libelle</h1>
+                    <div class="price-tag" style="font-size:1.6rem;">@prix.ToString("N0") <small>FCFA</small></div>
+                    @if (!string.IsNullOrEmpty(description)){ <p class="text-muted mt-2 mb-0">@description</p> }
+                    @if (!string.IsNullOrEmpty(typeBurger) || calories.HasValue || tempsPreparation.HasValue)
                     {
-                        <p class="card-text">@description</p>
+                        <div class="d-flex flex-wrap gap-2 mt-3">
+                            @if (!string.IsNullOrEmpty(typeBurger)){ <span class="badge" style="background:var(--gray-100); color:var(--gray-700); border:1px solid var(--gray-200); border-radius:999px;"><i class="fas fa-tag me-1"></i> @typeBurger</span> }
+                            @if (calories.HasValue){ <span class="badge" style="background:var(--gray-100); color:var(--gray-700); border:1px solid var(--gray-200); border-radius:999px;"><i class="fas fa-fire text-danger me-1"></i> @calories kcal</span> }
+                            @if (tempsPreparation.HasValue){ <span class="badge" style="background:var(--gray-100); color:var(--gray-700); border:1px solid var(--gray-200); border-radius:999px;"><i class="fas fa-clock text-primary me-1"></i> @tempsPreparation min</span> }
+                        </div>
                     }
                 </div>
             </div>
         </div>
-
-        <div class="col-md-6">
+        <div class="col-lg-6">
             <div class="card">
-                <div class="card-body">
-                    <h4 class="card-title mb-4">Personnalisez votre burger</h4>
-                    
-                    
-                    @if (TempData["ErrorMessage"] != null)
-                    {
-                        <div class="alert alert-danger">
-                            @TempData["ErrorMessage"]
-                        </div>
-                    }
-                    
-                    @if (!ViewData.ModelState.IsValid)
-                    {
-                        <div class="alert alert-danger">
-                            @Html.ValidationSummary(true, "", new { @class = "text-danger" })
-                        </div>
-                    }
-                    
-                    
-                    @if (!string.IsNullOrEmpty(typeBurger) || calories.HasValue || tempsPreparation.HasValue)
-                    {
-                        <div class="mb-4">
-                            <h5>Informations :</h5>
-                            <ul class="list-unstyled">
-                                @if (!string.IsNullOrEmpty(typeBurger))
-                                {
-                                    <li><i class="fas fa-hamburger"></i> Type : @typeBurger</li>
-                                }
-                                @if (calories.HasValue)
-                                {
-                                    <li><i class="fas fa-fire"></i> Calories : @calories.Value</li>
-                                }
-                                @if (tempsPreparation.HasValue)
-                                {
-                                    <li><i class="fas fa-clock"></i> Préparation : @tempsPreparation.Value min</li>
-                                }
-                            </ul>
-                        </div>
-                    }
-
-                    
+                <div class="card-body p-4">
+                    <h4 class="mb-1" style="letter-spacing:-0.02em;">Personnalisez votre burger</h4>
+                    <p class="text-muted mb-4" style="font-size:0.9rem;">Ajoutez une boisson et des frites — prix mis à jour en temps réel</p>
+                    @if (TempData["ErrorMessage"] != null){ <div class="alert alert-danger">@TempData["ErrorMessage"]</div> }
+                    @if (!ViewData.ModelState.IsValid){ <div class="alert alert-danger">@Html.ValidationSummary(true, "", new { @class = "text-danger" })</div> }
                     @if (Model != null)
                     {
                         <form method="post" asp-action="AddBurgerWithComplements" id="burgerForm">
                             @Html.AntiForgeryToken()
-                            
-                            <!-- Champs cachés pour les données principales -->
                             <input type="hidden" asp-for="Id" />
                             <input type="hidden" asp-for="Libelle" />
                             <input type="hidden" asp-for="Prix" />
@@ -98,8 +66,6 @@
                             <input type="hidden" asp-for="TypeBurger" />
                             <input type="hidden" asp-for="Calories" />
                             <input type="hidden" asp-for="TempsPreparation" />
-                            
-                            <!-- Champs cachés pour les listes (CRITIQUE) -->
                             @for (int i = 0; i < Model.Boissons?.Count; i++)
                             {
                                 <input type="hidden" asp-for="Boissons[i].Id" />
@@ -108,7 +74,6 @@
                                 <input type="hidden" asp-for="Boissons[i].Description" />
                                 <input type="hidden" asp-for="Boissons[i].ImageUrl" />
                             }
-                            
                             @for (int i = 0; i < Model.Frites?.Count; i++)
                             {
                                 <input type="hidden" asp-for="Frites[i].Id" />
@@ -117,197 +82,68 @@
                                 <input type="hidden" asp-for="Frites[i].Description" />
                                 <input type="hidden" asp-for="Frites[i].ImageUrl" />
                             }
-
-                            
                             <div class="mb-3">
-                                <label class="form-label fw-bold">Choisissez une boisson :</label>
+                                <label class="form-label fw-bold">Boisson</label>
                                 <select asp-for="SelectedBoissonId" class="form-select" id="boissonSelect">
                                     <option value="">Sans boisson</option>
-                                    @if (boissons.Any())
-                                    {
-                                        foreach (var boisson in boissons)
-                                        {
-                                            <option value="@boisson.Id" data-price="@boisson.Prix">
-                                                @boisson.Libelle (+@boisson.Prix.ToString("C0"))
-                                            </option>
-                                        }
-                                    }
+                                    @foreach (var b in boissons){ <option value="@b.Id" data-price="@b.Prix">@b.Libelle (+@b.Prix.ToString("N0") FCFA)</option> }
                                 </select>
-                                <span asp-validation-for="SelectedBoissonId" class="text-danger"></span>
+                                <span asp-validation-for="SelectedBoissonId" class="text-danger small"></span>
                             </div>
-
-                            
                             <div class="mb-3">
-                                <label class="form-label fw-bold">Choisissez des frites :</label>
+                                <label class="form-label fw-bold">Frites</label>
                                 <select asp-for="SelectedFritesId" class="form-select" id="fritesSelect">
                                     <option value="">Sans frites</option>
-                                    @if (frites.Any())
-                                    {
-                                        foreach (var frite in frites)
-                                        {
-                                            <option value="@frite.Id" data-price="@frite.Prix">
-                                                @frite.Libelle (+@frite.Prix.ToString("C0"))
-                                            </option>
-                                        }
-                                    }
+                                    @foreach (var fr in frites){ <option value="@fr.Id" data-price="@fr.Prix">@fr.Libelle (+@fr.Prix.ToString("N0") FCFA)</option> }
                                 </select>
-                                <span asp-validation-for="SelectedFritesId" class="text-danger"></span>
+                                <span asp-validation-for="SelectedFritesId" class="text-danger small"></span>
                             </div>
-
-                            
                             <div class="mb-4">
-                                <label asp-for="Quantity" class="form-label fw-bold">Quantité :</label>
-                                <div class="input-group" style="max-width: 150px;">
-                                    <button type="button" class="btn btn-outline-secondary" onclick="changeQuantity(-1)">-</button>
-                                    <input asp-for="Quantity" class="form-control text-center" 
-                                           min="1" max="10" id="quantityInput" readonly />
-                                    <button type="button" class="btn btn-outline-secondary" onclick="changeQuantity(1)">+</button>
+                                <label asp-for="Quantity" class="form-label fw-bold">Quantité</label>
+                                <div class="quantity-selector">
+                                    <button type="button" class="qty-btn" onclick="changeQuantity(-1)">−</button>
+                                    <input asp-for="Quantity" class="form-control text-center border-0 bg-transparent" style="width:60px; font-weight:800;" min="1" max="10" id="quantityInput" readonly />
+                                    <button type="button" class="qty-btn" onclick="changeQuantity(1)">+</button>
                                 </div>
-                                <span asp-validation-for="Quantity" class="text-danger"></span>
+                                <span asp-validation-for="Quantity" class="text-danger small"></span>
                             </div>
-
-                            
-                            <div class="card bg-light mb-4">
-                                <div class="card-body">
-                                    <h5 class="card-title">Récapitulatif</h5>
-                                    <ul class="list-unstyled mb-0">
-                                        <li>Burger : @prix.ToString("C0") × <span id="displayQty">1</span></li>
-                                        <li id="boissonLine" style="display: none;">
-                                            Boisson : +<span id="boissonPrice">0</span> × <span id="boissonQty">1</span>
-                                        </li>
-                                        <li id="fritesLine" style="display: none;">
-                                            Frites : +<span id="fritesPrice">0</span> × <span id="fritesQty">1</span>
-                                        </li>
-                                        <li class="mt-2 pt-2 border-top">
-                                            <strong>Total : <span class="text-primary" id="totalPrice">@prix.ToString("C0")</span> FCFA</strong>
-                                        </li>
-                                    </ul>
-                                </div>
+                            <div class="p-3 mb-4" style="background:var(--gray-50); border:1px solid var(--gray-100); border-radius: var(--radius-md);">
+                                <h6 class="mb-2" style="font-weight:700;"><i class="fas fa-receipt me-1" style="color:var(--primary)"></i> Récapitulatif</h6>
+                                <div class="d-flex justify-content-between" style="font-size:0.92rem;"><span>Burger × <span id="displayQty">1</span></span><span>@prix.ToString("N0") FCFA</span></div>
+                                <div id="boissonLine" class="d-flex justify-content-between" style="font-size:0.92rem; display:none !important;"><span>Boisson × <span id="boissonQty">1</span></span><span>+<span id="boissonPrice">0</span> FCFA</span></div>
+                                <div id="fritesLine" class="d-flex justify-content-between" style="font-size:0.92rem; display:none !important;"><span>Frites × <span id="fritesQty">1</span></span><span>+<span id="fritesPrice">0</span> FCFA</span></div>
+                                <hr class="my-2">
+                                <div class="d-flex justify-content-between fw-bold"><span>Total</span><span class="price-tag" id="totalPrice">@prix.ToString("N0") FCFA</span></div>
                             </div>
-
-                            
                             <div class="d-grid gap-2">
-                                <button type="submit" class="btn btn-primary btn-lg py-3">
-                                    <i class="fas fa-cart-plus me-2"></i>Ajouter au panier
-                                </button>
-                                <a href="@Url.Action("Index", "Home")" class="btn btn-outline-secondary">
-                                    <i class="fas fa-arrow-left me-2"></i>Retour au catalogue
-                                </a>
+                                <button type="submit" class="btn btn-primary btn-lg"><i class="fas fa-shopping-bag me-2"></i>Ajouter au panier</button>
+                                <a href="@Url.Action("Index", "Home")" class="btn btn-outline-secondary" style="border-radius:999px;">← Retour catalogue</a>
                             </div>
                         </form>
                     }
                     else
                     {
-                        <div class="alert alert-danger">
-                            <h5><i class="fas fa-exclamation-triangle"></i> Erreur</h5>
-                            <p>Les données du burger ne sont pas disponibles.</p>
-                            <a href="@Url.Action("Index", "Home")" class="btn btn-outline-primary">
-                                <i class="fas fa-arrow-left me-2"></i>Retour au catalogue
-                            </a>
-                        </div>
+                        <div class="alert alert-danger"><i class="fas fa-exclamation-triangle me-1"></i> Données indisponibles. <a href="@Url.Action("Index", "Home")">Retour catalogue</a></div>
                     }
                 </div>
             </div>
         </div>
     </div>
 </div>
-
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
     <script>
-        $(document).ready(function() {
-            console.log("Page AddBurgerWithComplements chargée");
-            
-            
-            @if (Model != null)
-            {
-                @:console.log("Boissons disponibles:", @boissons.Count);
-                @:console.log("Frites disponibles:", @frites.Count);
+        $(function(){
+            function calc(){
+                let bp=@prix; let q=parseInt($(''#quantityInput'').val())||1; $(''#displayQty'').text(q);
+                let bP=0, fP=0;
+                let bSel=$(''#boissonSelect'').find('':selected''); if(bSel.val()!==''''){ bP=parseFloat(bSel.data(''price''))||0; $(''#boissonLine'').show().css(''display'',''flex''); $(''#boissonPrice'').text(bP.toLocaleString(''fr-FR'')); $(''#boissonQty'').text(q); } else $(''#boissonLine'').hide();
+                let fSel=$(''#fritesSelect'').find('':selected''); if(fSel.val()!==''''){ fP=parseFloat(fSel.data(''price''))||0; $(''#fritesLine'').show().css(''display'',''flex''); $(''#fritesPrice'').text(fP.toLocaleString(''fr-FR'')); $(''#fritesQty'').text(q); } else $(''#fritesLine'').hide();
+                let total=(bp+bP+fP)*q; $(''#totalPrice'').text(total.toLocaleString(''fr-FR'')+'' FCFA'');
             }
-            else
-            {
-                @:console.log("Modèle non disponible");
-            }
-            
-            
-            function calculateTotal() {
-                let burgerPrice = @prix;
-                let quantity = parseInt($('#quantityInput').val()) || 1;
-                let boissonPrice = 0;
-                let fritesPrice = 0;
-                
-                
-                $('#displayQty').text(quantity);
-                
-                
-                let boissonSelect = $('#boissonSelect');
-                if (boissonSelect.length > 0) {
-                    let selectedBoisson = boissonSelect.find(':selected');
-                    if (selectedBoisson.val() !== '') {
-                        boissonPrice = parseFloat(selectedBoisson.data('price')) || 0;
-                        $('#boissonLine').show();
-                        $('#boissonPrice').text(boissonPrice.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ' '));
-                        $('#boissonQty').text(quantity);
-                    } else {
-                        $('#boissonLine').hide();
-                    }
-                }
-                
-                
-                let fritesSelect = $('#fritesSelect');
-                if (fritesSelect.length > 0) {
-                    let selectedFrites = fritesSelect.find(':selected');
-                    if (selectedFrites.val() !== '') {
-                        fritesPrice = parseFloat(selectedFrites.data('price')) || 0;
-                        $('#fritesLine').show();
-                        $('#fritesPrice').text(fritesPrice.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ' '));
-                        $('#fritesQty').text(quantity);
-                    } else {
-                        $('#fritesLine').hide();
-                    }
-                }
-                
-                let total = (burgerPrice + boissonPrice + fritesPrice) * quantity;
-                
-
-                $('#totalPrice').text(total.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ' ') + ' FCFA');
-                
-                console.log('Total calculé:', total);
-                return total;
-            }
-            
-            
-            window.changeQuantity = function(delta) {
-                let input = $('#quantityInput');
-                let current = parseInt(input.val()) || 1;
-                let newValue = current + delta;
-                
-                if (newValue >= 1 && newValue <= 10) {
-                    input.val(newValue);
-                    calculateTotal();
-                }
-            };
-            
-            
-            $('#boissonSelect, #fritesSelect').on('change', calculateTotal);
-            
-            calculateTotal();
-            
-            $('#burgerForm').on('submit', function(e) {
-                console.log('Soumission du formulaire...');
-                
-                let quantity = $('#quantityInput').val();
-                if (quantity < 1 || quantity > 10) {
-                    alert('La quantité doit être entre 1 et 10');
-                    e.preventDefault();
-                    return false;
-                }
-                
-                $('button[type="submit"]').html('<i class="fas fa-spinner fa-spin me-2"></i>Traitement...');
-                $('button[type="submit"]').prop('disabled', true);
-                
-                return true;
-            });
+            window.changeQuantity=function(d){ let i=$(''#quantityInput''); let v=parseInt(i.val())||1; v=Math.min(10,Math.max(1,v+d)); i.val(v); calc(); };
+            $(''#boissonSelect,#fritesSelect'').on(''change'', calc); calc();
+            $(''#burgerForm'').on(''submit'', function(){ $(this).find(''button[type="submit"]'').html(''<i class="fas fa-spinner fa-spin me-2"></i>Traitement...'').prop(''disabled'',true); });
         });
     </script>
 }

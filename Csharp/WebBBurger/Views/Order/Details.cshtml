@@ -1,178 +1,47 @@
-@model WebBBurger.Models.Commande
+﻿@model WebBBurger.Models.Commande
 @{
     ViewData["Title"] = $"Commande #{Model.Id} - Brasil Burger";
 }
-
-<div class="container my-5">
-    @if (TempData["SuccessMessage"] != null)
-    {
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
-            <i class="fas fa-check-circle me-2"></i>
-            @TempData["SuccessMessage"]
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>
-    }
-
-    @if (TempData["ErrorMessage"] != null)
-    {
-        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-            <i class="fas fa-exclamation-circle me-2"></i>
-            @TempData["ErrorMessage"]
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>
-    }
-
-    <div class="row">
+<div class="container py-4">
+    <div class="d-flex align-items-center gap-3 mb-4">
+        <a href="@Url.Action("History", "Order")" class="btn btn-outline-secondary btn-sm" style="border-radius:999px;"><i class="fas fa-arrow-left"></i></a>
+        <h1 class="h4 mb-0">Commande <span style="color:var(--primary)">#BB-@Model.Id</span></h1>
+        <span class="badge ms-2" style="background:var(--gray-100); color:var(--gray-700); border:1px solid var(--gray-200); border-radius:999px; padding:0.5rem 0.85rem;">@Model.Statut</span>
+        <span class="ms-auto fw-bold">@Model.MontantTotal.ToString("N0") FCFA</span>
+    </div>
+    <div class="row g-4">
         <div class="col-lg-8">
             <div class="card mb-4">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <h3 class="mb-0">
-                        Commande
-                        @if (!string.IsNullOrEmpty(Model.Numero) && Model.Numero.StartsWith("CMD-"))
-                        {
-                            <span>@Model.Numero</span>
-                        }
-                        else
-                        {
-                            <span>#@Model.Id</span>
-                        }
-                    </h3>
-                    <span class="badge @GetStatusBadgeClass(Model.Statut)">
-                        @GetStatusDisplay(Model.Statut)
-                    </span>
-                </div>
-                <div class="card-body">
-                    <div class="row mb-4">
-                        <div class="col-md-4">
-                            <p class="text-muted mb-1">Date de commande</p>
-                            <p class="fw-bold">@Model.CreatedAt.ToString("dddd dd MMMM yyyy 'à' HH:mm")</p>
+                <div class="card-header"><i class="fas fa-list me-2" style="color:var(--primary)"></i> Articles</div>
+                <div class="card-body p-0">
+                    @if (Model.Lignes != null){ foreach(var l in Model.Lignes){
+                        <div class="d-flex justify-content-between p-3" style="border-bottom:1px solid var(--gray-100);">
+                            <div><strong>@l.Produit?.Libelle</strong> <span class="text-muted">× @l.Quantite</span><div class="text-muted" style="font-size:0.85rem;">@l.Produit?.Description</div></div>
+                            <strong>@((l.Prix * l.Quantite).ToString("N0")) FCFA</strong>
                         </div>
-                        <div class="col-md-4">
-                            <p class="text-muted mb-1">Montant total</p>
-                            <p class="fw-bold text-success fs-4">@Model.MontantTotal.ToString("C0") FCFA</p>
-                        </div>
-                        <div class="col-md-4">
-                            <p class="text-muted mb-1">Mode de retrait</p>
-                            <p class="fw-bold">
-                                @GetTypeRetraitDisplay(Model.TypeRetrait)
-                                @if (Model.TypeRetrait == "LIVRAISON" && Model.Zone != null)
-                                {
-                                    <br>
-                                    <small class="text-muted">Zone : @Model.Zone.Nom
-                                        (+@Model.Zone.PrixLivraison.ToString("C0") FCFA)</small>
-                                }
-                            </p>
-                        </div>
-                    </div>
-
-                    @if (!string.IsNullOrEmpty(Model.Adresse))
-                    {
-                        <div class="alert alert-info">
-                            <i class="fas fa-map-marker-alt me-2"></i>
-                            <strong>Adresse</strong><br>
-                            @Model.Adresse
-                        </div>
-                    }
-
-                    @if (!string.IsNullOrEmpty(Model.Notes))
-                    {
-                        <div class="alert alert-secondary">
-                            <i class="fas fa-sticky-note me-2"></i>
-                            <strong>Notes :</strong><br>
-                            @Model.Notes
-                        </div>
-                    }
+                    }}
                 </div>
             </div>
-
-
-            <div class="card mb-4">
-                <div class="card-header">
-                    <h5 class="mb-0"><i class="fas fa-cogs me-2"></i>Actions</h5>
-                </div>
-                <div class="card-body">
-                    @if (Model.Statut == "EN_ATTENTE")
-                    {
-                        <a href="@Url.Action("Payment", "Order", new { orderId = Model.Id })"
-                            class="btn btn-success btn-lg me-2 mb-2">
-                            <i class="fas fa-credit-card me-2"></i>Procéder au paiement
-                        </a>
-                    }
-
-                    @if (CanCancel(Model.Statut))
-                    {
-                        <form method="post" action="@Url.Action("Cancel", "Order", new { id = Model.Id })"
-                            style="display:inline;">
-                            @Html.AntiForgeryToken()
-                            <button type="submit" class="btn btn-danger me-2 mb-2"
-                                onclick="return confirm('Êtes-vous sûr de vouloir annuler cette commande ?');">
-                                <i class="fas fa-times me-2"></i>Annuler la commande
-                            </button>
-                        </form>
-                    }
-
-                    <a href="@Url.Action("History", "Order")" class="btn btn-outline-secondary mb-2">
-                        <i class="fas fa-arrow-left me-2"></i>Retour à mes commandes
-                    </a>
+            <div class="card">
+                <div class="card-header"><i class="fas fa-truck me-2" style="color:var(--primary)"></i> Livraison</div>
+                <div class="card-body" style="font-size:0.92rem;">
+                    <p class="mb-1"><i class="fas fa-map-marker-alt me-2" style="color:var(--primary)"></i> @Model.Adresse</p>
+                    <p class="mb-1"><i class="fas fa-box me-2" style="color:var(--primary)"></i> Type : @Model.TypeRetrait</p>
+                    @if (Model.ZoneLivraison != null){ <p class="mb-1"><i class="fas fa-map me-2"></i> Zone : @Model.ZoneLivraison.Nom (+@Model.ZoneLivraison.PrixLivraison.ToString("N0") FCFA)</p> }
+                    <p class="mb-0"><i class="fas fa-credit-card me-2" style="color:var(--primary)"></i> Paiement : @Model.MoyenPaiement</p>
                 </div>
             </div>
-
-
         </div>
-
         <div class="col-lg-4">
+            <div class="cart-summary">
+                <h6 class="fw-bold mb-3">Récapitulatif</h6>
+                <div class="summary-line"><span>Sous-total</span><span>@Model.MontantTotal.ToString("N0") FCFA</span></div>
+                <div class="summary-line total"><span>Total payé</span><span>@Model.MontantTotal.ToString("N0") FCFA</span></div>
+                @if (Model.Statut != "TERMINEE" && Model.Statut != "ANNULEE"){
+                    <div class="d-grid mt-3"><a asp-action="Payment" asp-route-id="@Model.Id" class="btn btn-primary"><i class="fas fa-credit-card"></i> Payer</a></div>
+                }
+                <a href="@Url.Action("History", "Order")" class="btn btn-outline-secondary w-100 mt-2" style="border-radius:999px;">Historique</a>
+            </div>
         </div>
     </div>
 </div>
-
-@functions {
-    string GetStatusBadgeClass(string statut)
-    {
-        return statut switch
-        {
-            "EN_ATTENTE" => "bg-warning text-dark",
-            "VALIDEE" => "bg-info text-white",
-            "EN_PREPARATION" => "bg-primary text-white",
-            "PRETE" => "bg-secondary text-white",
-            "EN_LIVRAISON" => "bg-info text-white",
-            "LIVREE" => "bg-success text-white",
-            "TERMINEE" => "bg-success text-white",
-            "PAYE" => "bg-success text-white",
-            "ANNULEE" => "bg-danger text-white",
-            _ => "bg-secondary text-white"
-        };
-    }
-
-    string GetStatusDisplay(string statut)
-    {
-        return statut switch
-        {
-            "EN_ATTENTE" => "En attente",
-            "VALIDEE" => "Validée",
-            "EN_PREPARATION" => "En préparation",
-            "PRETE" => "Prête",
-            "EN_LIVRAISON" => "En livraison",
-            "LIVREE" => "Livrée",
-            "TERMINEE" => "Terminée",
-            "PAYE" => "Payée",
-            "ANNULEE" => "Annulée",
-            _ => statut
-        };
-    }
-
-    string GetTypeRetraitDisplay(string typeRetrait)
-    {
-        return typeRetrait switch
-        {
-            "SUR_PLACE" => "Sur place",
-            "A_EMPORTER" => "À emporter",
-            "LIVRAISON" => "Livraison",
-            _ => typeRetrait
-        };
-    }
-
-    bool CanCancel(string statut)
-    {
-        return statut == "EN_ATTENTE";
-    }
-}

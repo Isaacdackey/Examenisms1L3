@@ -1,104 +1,112 @@
-@model WebBBurger.Models.ViewModels.ProductViewModel
+﻿@model WebBBurger.Models.ViewModels.ProductViewModel
 @{
     ViewData["Title"] = $"{Model.Libelle} - Brasil Burger";
 }
-
 <div class="container mt-4">
-    <div class="row">
-        <div class="col-md-6">
-            <div class="card">
-                <img src="@Model.ImageUrl" class="card-img-top" alt="@Model.Libelle" 
-                     style="height: 400px; object-fit: cover;">
+    <nav aria-label="Fil d''Ariane" class="mb-3">
+        <ol class="breadcrumb" style="background:transparent; padding:0; margin:0; font-size:0.88rem;">
+            <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index" style="color:var(--gray-500)"><i class="fas fa-home me-1"></i> Catalogue</a></li>
+            <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index" asp-route-type="@Model.TypeProduct?.ToLower()" style="color:var(--gray-500)">@Model.TypeProduct</a></li>
+            <li class="breadcrumb-item active" aria-current="page" style="color:var(--neutral-900); font-weight:600;">@Model.Libelle</li>
+        </ol>
+    </nav>
+    <div class="row g-4">
+        <div class="col-lg-6">
+            <div class="card" style="padding:0; overflow:hidden;">
+                <div class="img-wrap" style="aspect-ratio: 1.1; background: var(--gray-50);">
+                    <img src="@Model.ImageUrl" alt="@Model.Libelle" style="width:100%; height:100%; object-fit:cover;" onerror="this.style.display=''none''" />
+                </div>
+            </div>
+            <div class="d-flex gap-2 mt-3">
+                <span class="badge" style="background:var(--neutral-900); color:var(--white); border-radius:999px; padding:0.5rem 0.85rem;"><i class="fas fa-shield-alt me-1" style="color:var(--accent-gold)"></i> Produit frais</span>
+                <span class="badge" style="background:var(--white); color:var(--gray-700); border:1.5px solid var(--gray-200); border-radius:999px; padding:0.5rem 0.85rem;"><i class="fas fa-truck me-1" style="color:var(--success)"></i> Livraison 30 min</span>
+                <span class="badge" style="background:var(--white); color:var(--gray-700); border:1.5px solid var(--gray-200); border-radius:999px; padding:0.5rem 0.85rem;"><i class="fas fa-star me-1" style="color:var(--warning)"></i> 4.8/5</span>
             </div>
         </div>
-
-        <div class="col-md-6">
-            <div class="card">
-                <div class="card-body">
-                    <h1 class="card-title">@Model.Libelle</h1>
-                    
+        <div class="col-lg-6">
+            <div class="card h-100">
+                <div class="card-body p-4">
+                    <span class="product-badge @(Model.TypeProduct?.ToLower()=="burger" ? "badge-burger" : Model.TypeProduct?.ToLower()=="menu" ? "badge-menu" : "badge-complement")" style="position:static; margin-bottom:0.75rem;"><i class="fas @(Model.TypeProduct=="BURGER" ? "fa-hamburger" : Model.TypeProduct=="MENU" ? "fa-layer-group" : "fa-mug-hot")"></i> @Model.TypeProduct</span>
+                    <h1 class="h2 mb-2" style="letter-spacing:-0.03em;">@Model.Libelle</h1>
                     @if (Model.TypeProduct == "MENU" && Model.PrixOriginal > 0)
                     {
-                        <div class="mb-3">
-                            <span class="text-muted text-decoration-line-through h5">
-                                @Model.PrixOriginal.ToString("C0") FCFA
-                            </span>
-                            <span class="h3 text-danger ms-2">@Model.Prix.ToString("C0") FCFA</span>
-                            <span class="badge bg-danger ms-2">Économisez @((Model.PrixOriginal - Model.Prix).ToString("C0")) FCFA</span>
+                        <div class="d-flex align-items-baseline gap-2 mb-3">
+                            <span class="price-original">@Model.PrixOriginal.ToString("N0") FCFA</span>
+                            <span class="price-tag" style="font-size:2rem;">@Model.Prix.ToString("N0") <small>FCFA</small></span>
+                            <span class="badge bg-danger" style="border-radius:999px;">Économisez @((Model.PrixOriginal - Model.Prix).ToString("N0")) FCFA</span>
                         </div>
                     }
                     else
                     {
-                        <h3 class="text-primary mb-3">@Model.Prix.ToString("C0") FCFA</h3>
+                        <div class="price-tag mb-3" style="font-size:2rem;">@Model.Prix.ToString("N0") <small>FCFA</small></div>
                     }
-
-                    <p class="card-text">@Model.Description</p>
+                    <p class="mb-4" style="color:var(--gray-600); line-height:1.7;">@Model.Description</p>
 
                     @if (Model.TypeProduct == "BURGER")
                     {
-                        <div class="mb-3">
-                            <h5>Informations nutritionnelles :</h5>
-                            <ul class="list-unstyled">
-                                <li><i class="fas fa-fire"></i> Calories : @(Model.Calories?.ToString() ?? "N/A")</li>
-                                <li><i class="fas fa-clock"></i> Préparation : @(Model.TempsPreparation?.ToString() ?? "N/A") min</li>
-                                <li><i class="fas fa-hamburger"></i> Type : @(Model.TypeBurger ?? "Classique")</li>
-                            </ul>
+                        <div class="p-3 mb-4" style="background:var(--gray-50); border:1px solid var(--gray-100); border-radius: var(--radius-md);">
+                            <h6 class="mb-2" style="font-weight:700;"><i class="fas fa-info-circle me-1" style="color:var(--primary)"></i> Informations</h6>
+                            <div class="d-flex flex-wrap gap-2">
+                                @if (Model.Calories.HasValue){ <span class="badge" style="background:var(--white); color:var(--gray-700); border:1px solid var(--gray-200); border-radius:999px;"><i class="fas fa-fire text-danger me-1"></i> @Model.Calories kcal</span> }
+                                @if (Model.TempsPreparation.HasValue){ <span class="badge" style="background:var(--white); color:var(--gray-700); border:1px solid var(--gray-200); border-radius:999px;"><i class="fas fa-clock text-primary me-1"></i> @Model.TempsPreparation min</span> }
+                                <span class="badge" style="background:var(--white); color:var(--gray-700); border:1px solid var(--gray-200); border-radius:999px;"><i class="fas fa-hamburger me-1"></i> @(Model.TypeBurger ?? "Classique")</span>
+                            </div>
+                        </div>
+                        <div class="alert alert-info" style="border-radius: var(--radius-md);">
+                            <i class="fas fa-magic me-2"></i> Envie de boisson et frites avec ce burger ?
+                            <a href="@Url.Action("AddBurgerWithComplements", "Home", new { id = Model.Id })" class="alert-link" style="font-weight:700;">Personnaliser ici →</a>
                         </div>
                     }
                     else if (Model.TypeProduct == "COMPLEMENT")
                     {
-                        <div class="mb-3">
-                            <h5>Détails :</h5>
-                            <ul class="list-unstyled">
-                                <li><i class="fas fa-wine-bottle"></i> Type : @(Model.TypeComplement ?? "Boisson")</li>
-                                <li><i class="fas fa-weight"></i> Volume : @(Model.Volume ?? "N/A")</li>
+                        <div class="p-3 mb-4" style="background:var(--gray-50); border:1px solid var(--gray-100); border-radius: var(--radius-md);">
+                            <h6 class="mb-2" style="font-weight:700;">Détails</h6>
+                            <ul class="list-unstyled mb-0" style="font-size:0.92rem; color:var(--gray-600);">
+                                <li><i class="fas fa-tag me-2" style="color:var(--primary)"></i> Type : @(Model.TypeComplement ?? "Boisson")</li>
+                                <li><i class="fas fa-weight me-2" style="color:var(--primary)"></i> Volume : @(Model.Volume ?? "Standard")</li>
                             </ul>
                         </div>
                     }
                     else if (Model.TypeProduct == "MENU")
                     {
-                        <div class="mb-3">
-                            <h5>Composition du menu :</h5>
-                            <ul class="list-unstyled">
-                                <li><i class="fas fa-hamburger"></i> Burger : @(Model.BurgerName ?? "Non spécifié")</li>
-                                <li><i class="fas fa-wine-bottle"></i> Boisson : @(Model.BoissonName ?? "Non spécifié")</li>
-                                <li><i class="fas fa-french-fries"></i> Frites : @(Model.FritesName ?? "Non spécifié")</li>
+                        <div class="p-3 mb-4" style="background:var(--primary-50); border:1px solid var(--primary-100); border-radius: var(--radius-md);">
+                            <h6 class="mb-2" style="font-weight:700; color:var(--primary-dark);"><i class="fas fa-layer-group me-1"></i> Composition</h6>
+                            <ul class="list-unstyled mb-0" style="font-size:0.92rem;">
+                                <li><i class="fas fa-check text-success me-2"></i> Burger : @(Model.BurgerName ?? "Inclus")</li>
+                                <li><i class="fas fa-check text-success me-2"></i> Boisson : @(Model.BoissonName ?? "Inclus")</li>
+                                <li><i class="fas fa-check text-success me-2"></i> Frites : @(Model.FritesName ?? "Inclus")</li>
                             </ul>
                         </div>
                     }
 
                     @if (Model.TypeProduct == "BURGER")
                     {
-                        <div class="alert alert-info">
-                            <i class="fas fa-info-circle"></i> 
-                            Pour personnaliser votre burger avec boisson et frites,
-                            <a href="@Url.Action("AddBurgerWithComplements", "Home", new { id = Model.Id })" class="alert-link">
-                                cliquez ici
-                            </a>
-                        </div>
+                        <a href="@Url.Action("AddBurgerWithComplements", "Home", new { id = Model.Id })" class="btn btn-primary btn-lg w-100 mb-2" style="border-radius: var(--radius-pill); padding:1rem;">
+                            <i class="fas fa-sliders-h"></i> Personnaliser & ajouter
+                        </a>
+                        <a href="@Url.Action("Index")" class="btn btn-outline-secondary w-100" style="border-radius:999px;">← Retour au catalogue</a>
                     }
                     else
                     {
-                        <form asp-action="AddToCart" asp-controller="Cart" method="post" class="mt-4">
+                        <form asp-action="AddToCart" asp-controller="Cart" method="post" class="mt-2">
                             @Html.AntiForgeryToken()
                             <input type="hidden" name="productId" value="@Model.Id" />
-                            
-                            <div class="row mb-3">
-                                <div class="col-md-4">
-                                    <label for="quantity" class="form-label">Quantité :</label>
-                                    <input type="number" id="quantity" name="quantity" 
-                                           class="form-control" value="1" min="1" max="10">
+                            <div class="row g-2 align-items-end mb-3">
+                                <div class="col-5 col-md-4">
+                                    <label for="quantity" class="form-label">Quantité</label>
+                                    <div class="quantity-selector w-100 justify-content-between">
+                                        <button type="button" class="qty-btn" onclick="changeQuantity(-1)">−</button>
+                                        <input type="number" id="quantity" name="quantity" class="form-control text-center border-0 bg-transparent" value="1" min="1" max="10" style="width:50px; font-weight:700;" readonly />
+                                        <button type="button" class="qty-btn" onclick="changeQuantity(1)">+</button>
+                                    </div>
+                                </div>
+                                <div class="col-7 col-md-8">
+                                    <button type="submit" class="btn btn-primary btn-lg w-100">
+                                        <i class="fas fa-shopping-bag"></i> Ajouter au panier
+                                    </button>
                                 </div>
                             </div>
-
-                            <div class="d-grid gap-2">
-                                <button type="submit" class="btn btn-primary btn-lg">
-                                    <i class="fas fa-cart-plus"></i> Ajouter au panier
-                                </button>
-                                <a href="@Url.Action("Index")" class="btn btn-outline-secondary">
-                                    <i class="fas fa-arrow-left"></i> Retour au catalogue
-                                </a>
-                            </div>
+                            <a href="@Url.Action("Index")" class="btn btn-outline-secondary w-100" style="border-radius:999px;">← Retour au catalogue</a>
                         </form>
                     }
                 </div>

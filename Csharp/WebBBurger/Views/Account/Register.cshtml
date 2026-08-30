@@ -1,28 +1,24 @@
-@model WebBBurger.Models.ViewModels.RegisterViewModel
+﻿@model WebBBurger.Models.ViewModels.RegisterViewModel
 @{
     ViewData["Title"] = "Inscription - Brasil Burger";
 }
-
-<div class="container mt-5">
+<div class="container py-5">
     <div class="row justify-content-center">
-        <div class="col-md-8 col-lg-7">
-            <div class="card shadow">
-                <div class="card-header bg-success text-white text-center py-3">
-                    <h3 class="mb-0"><i class="fas fa-user-plus"></i> Inscription</h3>
-                    <p class="mb-0">Rejoignez la communauté Brasil Burger</p>
-                </div>
+        <div class="col-lg-8">
+            <div class="text-center mb-4">
+                <div style="width:56px; height:56px; background:var(--neutral-900); color:var(--white); border-radius:16px; display:grid; place-items:center; margin:0 auto 0.75rem; font-size:1.4rem;"><i class="fas fa-user-plus"></i></div>
+                <h1 class="h3" style="letter-spacing:-0.02em;">Rejoignez Brasil Burger</h1>
+                <p class="text-muted">Créez votre compte en 30 secondes et commandez</p>
+            </div>
+            <div class="card auth-card">
                 <div class="card-body p-4">
-                    <form asp-action="Register" method="post">
+                    <form asp-action="Register" method="post" novalidate>
                         @if (TempData["ErrorMessage"] != null)
                         {
-                            <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                                @TempData["ErrorMessage"]
-                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                            </div>
+                            <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
                         }
-
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
+                        <div class="row g-3">
+                            <div class="col-md-6">
                                 <label asp-for="Nom" class="form-label">Nom *</label>
                                 <div class="input-group">
                                     <span class="input-group-text"><i class="fas fa-user"></i></span>
@@ -30,8 +26,7 @@
                                 </div>
                                 <span asp-validation-for="Nom" class="text-danger small"></span>
                             </div>
-
-                            <div class="col-md-6 mb-3">
+                            <div class="col-md-6">
                                 <label asp-for="Prenom" class="form-label">Prénom *</label>
                                 <div class="input-group">
                                     <span class="input-group-text"><i class="fas fa-user"></i></span>
@@ -39,19 +34,15 @@
                                 </div>
                                 <span asp-validation-for="Prenom" class="text-danger small"></span>
                             </div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
+                            <div class="col-md-6">
                                 <label asp-for="Email" class="form-label">Email *</label>
                                 <div class="input-group">
                                     <span class="input-group-text"><i class="fas fa-envelope"></i></span>
-                                    <input asp-for="Email" class="form-control" placeholder="votre@email.com" />
+                                    <input asp-for="Email" class="form-control" placeholder="vous@exemple.com" />
                                 </div>
                                 <span asp-validation-for="Email" class="text-danger small"></span>
                             </div>
-
-                            <div class="col-md-6 mb-3">
+                            <div class="col-md-6">
                                 <label asp-for="Tel" class="form-label">Téléphone *</label>
                                 <div class="input-group">
                                     <span class="input-group-text"><i class="fas fa-phone"></i></span>
@@ -59,144 +50,57 @@
                                 </div>
                                 <span asp-validation-for="Tel" class="text-danger small"></span>
                             </div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
+                            <div class="col-md-6">
                                 <label asp-for="Password" class="form-label">Mot de passe *</label>
                                 <div class="input-group">
                                     <span class="input-group-text"><i class="fas fa-lock"></i></span>
-                                    <input asp-for="Password" type="password" class="form-control" 
-                                           placeholder="Minimum 6 caractères" />
-                                    <button class="btn btn-outline-secondary" type="button" id="togglePassword">
-                                        <i class="fas fa-eye"></i>
-                                    </button>
+                                    <input asp-for="Password" type="password" class="form-control" placeholder="Min. 6 caractères" id="rpwd" />
+                                    <button class="btn btn-outline-secondary" type="button" onclick="var i=document.getElementById(''rpwd''); i.type=i.type===''password''?''text'':''password''"><i class="fas fa-eye"></i></button>
                                 </div>
                                 <span asp-validation-for="Password" class="text-danger small"></span>
                             </div>
-
-                            <div class="col-md-6 mb-3">
-                                <label asp-for="ConfirmPassword" class="form-label">Confirmer le mot de passe *</label>
+                            <div class="col-md-6">
+                                <label asp-for="ConfirmPassword" class="form-label">Confirmer *</label>
                                 <div class="input-group">
                                     <span class="input-group-text"><i class="fas fa-lock"></i></span>
-                                    <input asp-for="ConfirmPassword" type="password" class="form-control" 
-                                           placeholder="Répétez le mot de passe" />
-                                    <button class="btn btn-outline-secondary" type="button" id="toggleConfirmPassword">
-                                        <i class="fas fa-eye"></i>
-                                    </button>
+                                    <input asp-for="ConfirmPassword" type="password" class="form-control" placeholder="Répétez" />
                                 </div>
                                 <span asp-validation-for="ConfirmPassword" class="text-danger small"></span>
                             </div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-md-8 mb-3">
+                            <div class="col-md-8">
                                 <label asp-for="Adresse" class="form-label">Adresse</label>
                                 <div class="input-group">
                                     <span class="input-group-text"><i class="fas fa-home"></i></span>
-                                    <input asp-for="Adresse" class="form-control" placeholder="Votre adresse complète" />
+                                    <input asp-for="Adresse" class="form-control" placeholder="Adresse complète" />
                                 </div>
                                 <span asp-validation-for="Adresse" class="text-danger small"></span>
                             </div>
-
-                            <div class="col-md-4 mb-3">
+                            <div class="col-md-4">
                                 <label asp-for="Quartier" class="form-label">Quartier</label>
                                 <div class="input-group">
                                     <span class="input-group-text"><i class="fas fa-map-marker-alt"></i></span>
-                                    <input asp-for="Quartier" class="form-control" placeholder="Votre quartier" />
+                                    <input asp-for="Quartier" class="form-control" placeholder="Quartier" />
                                 </div>
                                 <span asp-validation-for="Quartier" class="text-danger small"></span>
                             </div>
-                        </div>
-
-                        <div class="mb-4">
-                            <div class="form-check">
-                                <input asp-for="AcceptTerms" class="form-check-input" />
-                                <label asp-for="AcceptTerms" class="form-check-label">
-                                    J'accepte les <a href="#" class="text-decoration-none">conditions d'utilisation</a> 
-                                    et la <a href="#" class="text-decoration-none">politique de confidentialité</a> *
-                                </label>
-                                <span asp-validation-for="AcceptTerms" class="text-danger small d-block"></span>
+                            <div class="col-12">
+                                <div class="form-check p-3" style="background:var(--gray-50); border:1px solid var(--gray-100); border-radius: var(--radius-md);">
+                                    <input asp-for="AcceptTerms" class="form-check-input" />
+                                    <label asp-for="AcceptTerms" class="form-check-label" style="font-size:0.9rem;">J''accepte les <a href="#">conditions d''utilisation</a> et la <a href="#">politique de confidentialité</a> *</label>
+                                    <span asp-validation-for="AcceptTerms" class="text-danger small d-block"></span>
+                                </div>
                             </div>
                         </div>
-
-                        <div class="d-grid mb-3">
-                            <button type="submit" class="btn btn-success btn-lg">
-                                <i class="fas fa-user-plus"></i> S'inscrire
-                            </button>
+                        <div class="d-grid mt-4">
+                            <button type="submit" class="btn btn-primary btn-lg"><i class="fas fa-user-plus"></i> S''inscrire</button>
                         </div>
-
-                        <hr class="my-4">
-
-                        <div class="text-center">
-                            <p class="mb-2">Vous avez déjà un compte ?</p>
-                            <a href="@Url.Action("Login")" class="btn btn-outline-primary">
-                                <i class="fas fa-sign-in-alt"></i> Se connecter
-                            </a>
+                        <div class="text-center mt-3">
+                            <span class="text-muted" style="font-size:0.9rem;">Déjà un compte ?</span> <a href="@Url.Action("Login")" style="font-weight:700;">Se connecter</a>
                         </div>
                     </form>
-                </div>
-                <div class="card-footer text-center py-3">
-                    <small class="text-muted">
-                        <i class="fas fa-info-circle"></i> 
-                        Les champs marqués d'un * sont obligatoires
-                    </small>
-                </div>
-            </div>
-
-            
-            <div class="row mt-4">
-                <div class="col-md-4 mb-3">
-                    <div class="card text-center h-100">
-                        <div class="card-body">
-                            <i class="fas fa-bolt fa-2x text-primary mb-3"></i>
-                            <h6>Commandes rapides</h6>
-                            <p class="small text-muted">Enregistrez vos adresses favorites</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-4 mb-3">
-                    <div class="card text-center h-100">
-                        <div class="card-body">
-                            <i class="fas fa-gift fa-2x text-warning mb-3"></i>
-                            <h6>Offres spéciales</h6>
-                            <p class="small text-muted">Recevez des promotions exclusives</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-4 mb-3">
-                    <div class="card text-center h-100">
-                        <div class="card-body">
-                            <i class="fas fa-history fa-2x text-success mb-3"></i>
-                            <h6>Suivi des commandes</h6>
-                            <p class="small text-muted">Consultez votre historique</p>
-                        </div>
-                    </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
-
-@section Scripts {
-    <partial name="_ValidationScriptsPartial" />
-    <script>
-        $(document).ready(function() {
-            $('#togglePassword').click(function() {
-                const passwordInput = $('#Password');
-                const type = passwordInput.attr('type') === 'password' ? 'text' : 'password';
-                passwordInput.attr('type', type);
-                $(this).find('i').toggleClass('fa-eye fa-eye-slash');
-            });
-
-            $('#toggleConfirmPassword').click(function() {
-                const passwordInput = $('#ConfirmPassword');
-                const type = passwordInput.attr('type') === 'password' ? 'text' : 'password';
-                passwordInput.attr('type', type);
-                $(this).find('i').toggleClass('fa-eye fa-eye-slash');
-            });
-
-            $('#Nom').focus();
-        });
-    </script>
-}
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

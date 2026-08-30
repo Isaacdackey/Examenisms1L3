@@ -1,120 +1,29 @@
-@{
+﻿@{
     ViewData["Title"] = "Contact - Brasil Burger";
 }
-
-<div class="container mt-4">
-    <div class="row">
-        <div class="col-lg-8 mx-auto">
-            <div class="card">
-                <div class="card-header bg-primary text-white text-center py-4">
-                    <h1 class="display-5 mb-0"><i class="fas fa-phone-alt"></i> Contactez-nous</h1>
+<div class="container py-5">
+    <div class="row justify-content-center"><div class="col-lg-8">
+        <div class="text-center mb-4">
+            <div style="width:56px; height:56px; background:var(--primary); color:var(--white); border-radius:16px; display:grid; place-items:center; margin:0 auto 0.75rem;"><i class="fas fa-phone-alt"></i></div>
+            <h1 class="h3">Contactez-nous</h1>
+            <p class="text-muted">Une question ? Une commande spéciale ? Nous sommes là 7j/7</p>
+        </div>
+        <div class="card">
+            <div class="card-body p-4">
+                <div class="row g-4 mb-4">
+                    <div class="col-md-4 text-center"><div style="width:48px; height:48px; background:var(--primary-50); color:var(--primary); border-radius:50%; display:grid; place-items:center; margin:0 auto 0.5rem;"><i class="fas fa-map-marker-alt"></i></div><strong>Dakar</strong><div class="text-muted" style="font-size:0.9rem;">Point E, Sénégal</div></div>
+                    <div class="col-md-4 text-center"><div style="width:48px; height:48px; background:var(--success-light); color:var(--success); border-radius:50%; display:grid; place-items:center; margin:0 auto 0.5rem;"><i class="fas fa-phone"></i></div><strong>+221 77 123 45 67</strong><div class="text-muted" style="font-size:0.9rem;">10h — 23h</div></div>
+                    <div class="col-md-4 text-center"><div style="width:48px; height:48px; background:var(--accent-gold-light); color:var(--accent-gold-dark); border-radius:50%; display:grid; place-items:center; margin:0 auto 0.5rem;"><i class="fas fa-envelope"></i></div><strong>contact@brasilburger.sn</strong><div class="text-muted" style="font-size:0.9rem;">Réponse rapide</div></div>
                 </div>
-                <div class="card-body p-5">
-                    <div class="row mb-5">
-                        <div class="col-md-6 mb-4">
-                            <div class="card h-100">
-                                <div class="card-body text-center">
-                                    <div class="mb-3">
-                                        <i class="fas fa-map-marker-alt fa-3x text-primary"></i>
-                                    </div>
-                                    <h5>Adresse</h5>
-                                    <p class="text-muted">
-                                        Rue des Burgers, Plateau<br>
-                                        Dakar, Sénégal
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-6 mb-4">
-                            <div class="card h-100">
-                                <div class="card-body text-center">
-                                    <div class="mb-3">
-                                        <i class="fas fa-clock fa-3x text-warning"></i>
-                                    </div>
-                                    <h5>Horaires</h5>
-                                    <p class="text-muted">
-                                        Lundi - Dimanche<br>
-                                        10h00 - 23h00
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
+                <form>
+                    <div class="row g-3">
+                        <div class="col-md-6"><label class="form-label">Nom</label><input class="form-control" placeholder="Votre nom" /></div>
+                        <div class="col-md-6"><label class="form-label">Email</label><input class="form-control" placeholder="vous@exemple.com" /></div>
+                        <div class="col-12"><label class="form-label">Message</label><textarea class="form-control" rows="4" placeholder="Votre message..."></textarea></div>
                     </div>
-
-                    <div class="mb-5">
-                        <h3 class="text-primary mb-4">
-                            <i class="fas fa-envelope"></i> Envoyez-nous un message
-                        </h3>
-                        <form id="contactForm">
-                            <div class="mb-3">
-                                <label for="name" class="form-label">Nom complet *</label>
-                                <input type="text" class="form-control" id="name" required>
-                            </div>
-                            <div class="mb-3">
-                                <label for="email" class="form-label">Email *</label>
-                                <input type="email" class="form-control" id="email" required>
-                            </div>
-                            <div class="mb-3">
-                                <label for="phone" class="form-label">Téléphone</label>
-                                <input type="tel" class="form-control" id="phone">
-                            </div>
-                            <div class="mb-3">
-                                <label for="subject" class="form-label">Sujet *</label>
-                                <select class="form-select" id="subject" required>
-                                    <option value="">Choisissez un sujet</option>
-                                    <option value="commande">Commande</option>
-                                    <option value="livraison">Livraison</option>
-                                    <option value="qualite">Qualité</option>
-                                    <option value="reclamation">Réclamation</option>
-                                    <option value="autre">Autre</option>
-                                </select>
-                            </div>
-                            <div class="mb-3">
-                                <label for="message" class="form-label">Message *</label>
-                                <textarea class="form-control" id="message" rows="5" required></textarea>
-                            </div>
-                            <div class="d-grid">
-                                <button type="submit" class="btn btn-primary btn-lg">
-                                    <i class="fas fa-paper-plane"></i> Envoyer le message
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-
-                    <div class="alert alert-success">
-                        <h5><i class="fas fa-mobile-alt"></i> Contact direct</h5>
-                        <div class="row">
-                            <div class="col-md-6">
-                                <p class="mb-1">
-                                    <strong><i class="fas fa-phone"></i> Téléphone :</strong><br>
-                                    <a href="tel:+221771234567" class="text-decoration-none">+221 77 123 45 67</a>
-                                </p>
-                            </div>
-                            <div class="col-md-6">
-                                <p class="mb-1">
-                                    <strong><i class="fas fa-envelope"></i> Email :</strong><br>
-                                    <a href="mailto:contact@brasilburger.sn" class="text-decoration-none">
-                                        contact@brasilburger.sn
-                                    </a>
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                    <button type="submit" class="btn btn-primary w-100 mt-4 btn-lg"><i class="fas fa-paper-plane"></i> Envoyer</button>
+                </form>
             </div>
         </div>
-    </div>
+    </div></div>
 </div>
-
-@section Scripts {
-    <script>
-        $(document).ready(function() {
-            $('#contactForm').submit(function(e) {
-                e.preventDefault();
-                
-                alert('Merci pour votre message ! Nous vous répondrons dans les plus brefs délais.');
-                this.reset();
-            });
-        });
-    </script>
-}

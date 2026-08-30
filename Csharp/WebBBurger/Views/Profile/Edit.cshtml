@@ -1,78 +1,30 @@
-@model WebBBurger.Controllers.EditProfileViewModel
+﻿@model WebBBurger.Controllers.EditProfileViewModel
 @{
     ViewData["Title"] = "Modifier mon profil - Brasil Burger";
 }
-
-<div class="container mt-4">
-    <h1 class="mb-4"><i class="fas fa-user-edit"></i> Modifier mon profil</h1>
-
-    <div class="row justify-content-center">
-        <div class="col-md-8">
-            <div class="card">
-                <div class="card-header bg-primary text-white">
-                    <h5 class="mb-0">Modifier mes informations</h5>
-                </div>
-                <div class="card-body">
-                    <form asp-action="Edit" method="post">
-                        @Html.AntiForgeryToken()
-                        
-                        @if (!ViewData.ModelState.IsValid)
-                        {
-                            <div class="alert alert-danger">
-                                @Html.ValidationSummary()
-                            </div>
-                        }
-
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label asp-for="Prenom" class="form-label"></label>
-                                <input asp-for="Prenom" class="form-control" />
-                                <span asp-validation-for="Prenom" class="text-danger"></span>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label asp-for="Nom" class="form-label"></label>
-                                <input asp-for="Nom" class="form-control" />
-                                <span asp-validation-for="Nom" class="text-danger"></span>
-                            </div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label asp-for="Email" class="form-label"></label>
-                                <input asp-for="Email" class="form-control" type="email" />
-                                <span asp-validation-for="Email" class="text-danger"></span>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label asp-for="Tel" class="form-label"></label>
-                                <input asp-for="Tel" class="form-control" />
-                                <span asp-validation-for="Tel" class="text-danger"></span>
-                            </div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-md-8 mb-3">
-                                <label asp-for="Adresse" class="form-label"></label>
-                                <input asp-for="Adresse" class="form-control" />
-                                <span asp-validation-for="Adresse" class="text-danger"></span>
-                            </div>
-                            <div class="col-md-4 mb-3">
-                                <label asp-for="Quartier" class="form-label"></label>
-                                <input asp-for="Quartier" class="form-control" />
-                                <span asp-validation-for="Quartier" class="text-danger"></span>
-                            </div>
-                        </div>
-
-                        <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
-                            <a href="@Url.Action("Index")" class="btn btn-outline-secondary me-md-2">
-                                <i class="fas fa-times"></i> Annuler
-                            </a>
-                            <button type="submit" class="btn btn-primary">
-                                <i class="fas fa-save"></i> Enregistrer les modifications
-                            </button>
-                        </div>
-                    </form>
-                </div>
+<div class="container py-4">
+    <div class="row justify-content-center"><div class="col-lg-7">
+        <div class="card">
+            <div class="card-header"><i class="fas fa-user-edit me-2" style="color:var(--primary)"></i> Modifier mes informations</div>
+            <div class="card-body p-4">
+                <form asp-action="Edit" method="post">
+                    @Html.AntiForgeryToken()
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                    <div class="row g-3">
+                        <div class="col-md-6"><label asp-for="Nom" class="form-label"></label><input asp-for="Nom" class="form-control" /><span asp-validation-for="Nom" class="text-danger small"></span></div>
+                        <div class="col-md-6"><label asp-for="Prenom" class="form-label"></label><input asp-for="Prenom" class="form-control" /><span asp-validation-for="Prenom" class="text-danger small"></span></div>
+                        <div class="col-md-6"><label asp-for="Email" class="form-label"></label><input asp-for="Email" class="form-control" /><span asp-validation-for="Email" class="text-danger small"></span></div>
+                        <div class="col-md-6"><label asp-for="Tel" class="form-label"></label><input asp-for="Tel" class="form-control" /><span asp-validation-for="Tel" class="text-danger small"></span></div>
+                        <div class="col-md-8"><label asp-for="Adresse" class="form-label"></label><input asp-for="Adresse" class="form-control" /><span asp-validation-for="Adresse" class="text-danger small"></span></div>
+                        <div class="col-md-4"><label asp-for="Quartier" class="form-label"></label><input asp-for="Quartier" class="form-control" /><span asp-validation-for="Quartier" class="text-danger small"></span></div>
+                    </div>
+                    <div class="d-flex gap-2 mt-4">
+                        <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Enregistrer</button>
+                        <a asp-action="Index" class="btn btn-outline-secondary" style="border-radius:999px;">Annuler</a>
+                    </div>
+                </form>
             </div>
         </div>
-    </div>
+    </div></div>
 </div>
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

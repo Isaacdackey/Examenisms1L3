@@ -1,158 +1,160 @@
-@model IEnumerable<WebBBurger.Models.ViewModels.ProductViewModel>
+﻿@model IEnumerable<WebBBurger.Models.ViewModels.ProductViewModel>
 @{
-
     var typeParam = Context.Request.Query["type"].ToString();
     var searchParam = Context.Request.Query["search"].ToString();
-    
-
-    var currentFilter = !string.IsNullOrEmpty(typeParam) ? typeParam : 
+    var currentFilter = !string.IsNullOrEmpty(typeParam) ? typeParam :
                        !string.IsNullOrEmpty(searchParam) ? searchParam : null;
-    
-    string pageTitle = "Catalogue - Brasil Burger";
-    string pageSubtitle = "Découvrez nos burgers artisanaux préparés avec des ingrédients frais et locaux.";
-    
+
+    string heroTitle = "Le Goût du Brésil";
+    string heroSubtitle = "Burgers artisanaux, menus généreux et compléments irrésistibles — préparés à la commande à Dakar.";
+    string pageTitle = "Catalogue";
     if (!string.IsNullOrEmpty(typeParam))
     {
-        pageTitle = typeParam.ToLower() switch
+        heroTitle = typeParam.ToLower() switch
         {
-            "burger" => "Nos Burgers - Brasil Burger",
-            "menu" => "Nos Menus - Brasil Burger",
-            "complement" => "Nos Compléments - Brasil Burger",
-            _ => $"Nos Produits {typeParam} - Brasil Burger"
+            "burger" => "Nos Burgers",
+            "menu" => "Nos Menus",
+            "complement" => "Nos Compléments",
+            _ => $"Nos {typeParam}"
+        };
+        heroSubtitle = typeParam.ToLower() switch
+        {
+            "burger" => "Bœuf juteux, pains briochés, sauces maison — la star de Brasil Burger.",
+            "menu" => "Formules complètes burger + boisson + frites à prix malin.",
+            "complement" => "Frites croustillantes, boissons fraîches et accompagnements gourmands.",
+            _ => "Sélection filtrée pour vous."
         };
     }
     else if (!string.IsNullOrEmpty(searchParam))
     {
-        pageTitle = $"Recherche : {searchParam} - Brasil Burger";
-        pageSubtitle = "Résultats de votre recherche";
+        heroTitle = $"Résultats : « {searchParam} »";
+        heroSubtitle = "Voici ce que nous avons trouvé pour vous.";
     }
 }
-
-<div class="container mt-4">
-
-    @if (!string.IsNullOrEmpty(currentFilter))
-    {
-        <div class="alert alert-info alert-dismissible fade show mb-4" role="alert">
-            <i class="fas fa-filter me-2"></i>
-            <strong>Filtre actif :</strong> 
-            @if (!string.IsNullOrEmpty(typeParam))
-            {
-                @switch (typeParam.ToLower())
-                {
-                    case "burger": <text>Burgers</text>; break;
-                    case "menu": <text>Menus</text>; break;
-                    case "complement": <text>Compléments</text>; break;
-                    default: @typeParam; break;
-                }
-            }
-            else if (!string.IsNullOrEmpty(searchParam))
-            {
-                <text>Recherche : @searchParam</text>
-            }
-            <a href="/" class="btn-close" aria-label="Supprimer le filtre"></a>
-        </div>
-    }
-
-    <div class="row mb-4">
-        <div class="col-md-8">
-            <h1 class="display-4">@pageTitle</h1>
-            <p class="lead">@pageSubtitle</p>
-        </div>
-        
-        <div class="col-md-4">
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title"><i class="fas fa-filter"></i> Filtres</h5>
-                    <div class="btn-group-vertical w-100" role="group">
-                        <a href="/" 
-                           class="btn @(string.IsNullOrEmpty(typeParam) ? "btn-primary" : "btn-outline-primary") mb-2">
-                            <i class="fas fa-th-large"></i> Tous les produits
-                        </a>
-                        
-                        <a href="/?type=burger" 
-                           class="btn @(typeParam?.ToLower() == "burger" ? "btn-primary" : "btn-outline-primary") mb-2">
-                            <i class="fas fa-hamburger"></i> Burgers
-                        </a>
-                        
-
-                        <a href="/?type=menu" 
-                           class="btn @(typeParam?.ToLower() == "menu" ? "btn-primary" : "btn-outline-primary") mb-2">
-                            <i class="fas fa-utensils"></i> Menus
-                        </a>
-                        
-
-                        <a href="/?type=complement" 
-                           class="btn @(typeParam?.ToLower() == "complement" ? "btn-primary" : "btn-outline-primary") mb-2">
-                            <i class="fas fa-french-fries"></i> Compléments
-                        </a>
+@* HERO — masqué quand filtre/recherche actif pour garder le focus catalogue, mais version compacte affichée *@
+@if (string.IsNullOrEmpty(currentFilter))
+{
+    <section class="hero-section">
+        <div class="container position-relative" style="z-index:1;">
+            <div class="row align-items-center g-4">
+                <div class="col-lg-7">
+                    <span class="badge bg-white text-dark mb-3" style="border-radius:999px; padding:0.45rem 0.85rem; font-weight:700; letter-spacing:0.04em; font-size:0.78rem;"><i class="fas fa-fire text-danger me-1"></i> NOUVEAUTÉS SAISON</span>
+                    <h1 class="hero-title">@heroTitle <span>à Dakar</span></h1>
+                    <p class="hero-subtitle">@heroSubtitle</p>
+                    <div class="hero-cta">
+                        <a href="#catalogue" class="btn"><i class="fas fa-utensils"></i> Commander maintenant</a>
+                        <a href="/?type=menu" class="btn btn-outline"><i class="fas fa-tag"></i> Voir les menus</a>
                     </div>
+                    <div class="d-flex align-items-center gap-3 mt-4" style="color:rgba(255,255,255,0.9); font-size:0.88rem;">
+                        <span><i class="fas fa-star" style="color:var(--accent-gold-light)"></i> 4.8/5 (2 400+ avis)</span>
+                        <span style="opacity:0.5">•</span>
+                        <span><i class="fas fa-bolt"></i> Livraison 30 min</span>
+                        <span style="opacity:0.5">•</span>
+                        <span><i class="fas fa-leaf"></i> Produits frais</span>
+                    </div>
+                </div>
+                <div class="col-lg-5 d-none d-lg-block">
+                    <div class="position-relative" style="background:rgba(255,255,255,0.12); backdrop-filter: blur(12px); border:1px solid rgba(255,255,255,0.18); border-radius:20px; padding:1.25rem; box-shadow: 0 20px 40px rgba(0,0,0,0.15);">
+                        <div class="d-flex align-items-center gap-3 mb-3">
+                            <img src="https://images.unsplash.com/photo-1568909344668-6f14a07b56a0?w=200&h=200&fit=crop" alt="Burger" style="width:72px; height:72px; border-radius:14px; object-fit:cover;" />
+                            <div>
+                                <div style="font-weight:800; color:var(--white);">Brasil Classic</div>
+                                <div style="color:rgba(255,255,255,0.8); font-size:0.85rem;">Bœuf • cheddar • sauce maison</div>
+                                <div style="font-weight:800; color:var(--accent-gold-light);">3 500 FCFA</div>
+                            </div>
+                            <span class="ms-auto badge" style="background:var(--accent-gold); color:var(--neutral-900); border-radius:999px; font-weight:800;">-15%</span>
+                        </div>
+                        <div class="d-flex gap-2">
+                            <span class="flex-fill text-center py-2" style="background:var(--white); color:var(--neutral-900); border-radius:999px; font-weight:700; font-size:0.85rem;"><i class="fas fa-motorcycle me-1" style="color:var(--primary)"></i> Livraison</span>
+                            <span class="flex-fill text-center py-2" style="background:rgba(255,255,255,0.14); color:var(--white); border:1px solid rgba(255,255,255,0.3); border-radius:999px; font-weight:600; font-size:0.85rem;"><i class="fas fa-store me-1"></i> Sur place</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+}
+else
+{
+    <section class="py-4" style="background:var(--white); border-bottom:1px solid var(--gray-100);">
+        <div class="container">
+            <div class="d-flex align-items-center gap-2 flex-wrap">
+                <a href="/" class="text-muted" style="font-size:0.88rem;"><i class="fas fa-home"></i> Accueil</a>
+                <span class="text-muted">/</span>
+                <strong style="color:var(--neutral-900)">@heroTitle</strong>
+                <span class="ms-auto badge" style="background:var(--primary-50); color:var(--primary-dark); border:1px solid var(--primary-100); border-radius:999px; padding:0.4rem 0.75rem;"><i class="fas fa-filter me-1"></i> Filtre actif</span>
+                <a href="/" class="btn btn-sm btn-outline-secondary" style="border-radius:999px;"><i class="fas fa-times me-1"></i> Effacer</a>
+            </div>
+        </div>
+    </section>
+}
+
+<div class="container mt-4" id="catalogue">
+    <!-- Barre recherche + filtres pills -->
+    <div class="filter-section mb-4 reveal">
+        <div class="row g-3 align-items-center">
+            <div class="col-lg-5">
+                <form method="get" class="d-flex gap-2">
+                    <div class="search-box flex-fill">
+                        <i class="fas fa-search"></i>
+                        <input type="text" name="search" class="form-control" placeholder="Rechercher un burger, menu, boisson..." value="@searchParam" aria-label="Rechercher" />
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="border-radius:999px; white-space:nowrap;">
+                        <i class="fas fa-search d-lg-none"></i> <span class="d-none d-lg-inline">Rechercher</span>
+                    </button>
+                </form>
+            </div>
+            <div class="col-lg-7">
+                <div class="filter-pills justify-content-lg-end">
+                    <a href="/" class="filter-pill @(string.IsNullOrEmpty(typeParam) && string.IsNullOrEmpty(searchParam) ? "active" : "")"><i class="fas fa-th-large"></i> Tous</a>
+                    <a href="/?type=burger" class="filter-pill @(typeParam?.ToLower() == "burger" ? "active" : "")"><i class="fas fa-hamburger"></i> Burgers</a>
+                    <a href="/?type=menu" class="filter-pill @(typeParam?.ToLower() == "menu" ? "active" : "")"><i class="fas fa-layer-group"></i> Menus</a>
+                    <a href="/?type=complement" class="filter-pill @(typeParam?.ToLower() == "complement" ? "active" : "")"><i class="fas fa-mug-hot"></i> Compléments</a>
                 </div>
             </div>
         </div>
     </div>
 
-
-    <div class="row mb-4">
-        <div class="col-12">
-            <form method="get" class="d-flex">
-                <input type="text" name="search" class="form-control me-2" 
-                       placeholder="Rechercher un produit..." value="@searchParam">
-                <button type="submit" class="btn btn-primary">
-                    <i class="fas fa-search"></i> Rechercher
-                </button>
-                
-                @if (!string.IsNullOrEmpty(currentFilter))
-                {
-                    <a href="/" class="btn btn-outline-danger ms-2">
-                        <i class="fas fa-times"></i> Effacer
-                    </a>
-                }
-            </form>
-        </div>
-    </div>
-
-
     @{
-    
         var filteredProducts = Model;
-        
         if (!string.IsNullOrEmpty(typeParam))
         {
             var filterType = typeParam.ToUpper();
-            filteredProducts = Model.Where(p => 
-                p.TypeProduct?.ToUpper() == filterType
-            ).ToList();
+            filteredProducts = Model.Where(p => p.TypeProduct?.ToUpper() == filterType).ToList();
         }
         else if (!string.IsNullOrEmpty(searchParam))
         {
             var searchLower = searchParam.ToLower();
-            filteredProducts = Model.Where(p => 
-                (p.Libelle != null && p.Libelle.ToLower().Contains(searchLower)) ||
-                (p.Description != null && p.Description.ToLower().Contains(searchLower))
-            ).ToList();
+            filteredProducts = Model.Where(p => (p.Libelle != null && p.Libelle.ToLower().Contains(searchLower)) || (p.Description != null && p.Description.ToLower().Contains(searchLower))).ToList();
         }
     }
 
+    <div class="d-flex align-items-center justify-content-between mb-2">
+        <h2 class="h4 mb-0" style="letter-spacing:-0.02em;">@filteredProducts.Count() produit(s)</h2>
+        <span class="text-muted" style="font-size:0.88rem;"><i class="fas fa-bolt me-1" style="color:var(--primary)"></i> Prêt en 10-20 min</span>
+    </div>
 
-    <div class="row">
+    <div class="row g-4">
         @if (!filteredProducts.Any())
         {
             <div class="col-12">
-                <div class="alert alert-warning text-center py-5">
-                    <i class="fas fa-search fa-3x mb-3"></i>
-                    <h3>Aucun produit trouvé</h3>
-                    <p class="text-muted">
-                        @if (!string.IsNullOrEmpty(searchParam))
-                        {
-                            <text>Aucun produit ne correspond à votre recherche "<strong>@searchParam</strong>".</text>
-                        }
-                        else if (!string.IsNullOrEmpty(typeParam))
-                        {
-                            <text>Aucun produit de type <strong>@typeParam</strong> disponible.</text>
-                        }
-                        <br>
-                        Essayez un autre filtre ou <a href="/">consultez tous nos produits</a>.
-                    </p>
+                <div class="card text-center py-5 reveal" style="border-style:dashed;">
+                    <div class="card-body">
+                        <div style="width:64px; height:64px; background:var(--primary-50); color:var(--primary); border-radius:50%; display:grid; place-items:center; margin:0 auto 1rem; font-size:1.6rem;"><i class="fas fa-search"></i></div>
+                        <h3 class="h5">Aucun produit trouvé</h3>
+                        <p class="text-muted mx-auto" style="max-width:520px;">
+                            @if (!string.IsNullOrEmpty(searchParam))
+                            {
+                                <text>Aucun résultat pour "<strong>@searchParam</strong>". Vérifiez l''orthographe ou essayez un autre mot-clé.</text>
+                            }
+                            else if (!string.IsNullOrEmpty(typeParam))
+                            {
+                                <text>Aucun produit de type <strong>@typeParam</strong> disponible pour le moment.</text>
+                            }
+                            <br>Explorez notre catalogue complet.
+                        </p>
+                        <a href="/" class="btn btn-primary mt-2"><i class="fas fa-undo"></i> Voir tous les produits</a>
+                    </div>
                 </div>
             </div>
         }
@@ -160,65 +162,60 @@
         {
             @foreach (var product in filteredProducts)
             {
-                <div class="col-md-4 col-lg-3 mb-4">
-                    <div class="card h-100 product-card">
-                        <div class="position-relative">
+                <div class="col-6 col-lg-3 reveal">
+                    <div class="card product-card h-100">
+                        <div class="img-wrap">
                             @if (!string.IsNullOrEmpty(product.ImageUrl))
                             {
-                                <img src="@product.ImageUrl" class="card-img-top" alt="@product.Libelle" 
-                                     style="height: 200px; object-fit: cover;">
+                                <img src="@product.ImageUrl" class="card-img-top" alt="@product.Libelle" loading="lazy">
                             }
                             else
                             {
-                                <div class="card-img-top bg-light d-flex align-items-center justify-content-center" 
-                                     style="height: 200px;">
-                                    <i class="fas fa-hamburger fa-3x text-muted"></i>
+                                <div class="w-100 h-100 d-flex align-items-center justify-content-center" style="background: linear-gradient(135deg, var(--primary-50), var(--accent-gold-light));">
+                                    <i class="fas fa-hamburger fa-2x" style="color:var(--primary)"></i>
                                 </div>
                             }
-                            
-                            <span class="position-absolute top-0 end-0 m-2 badge 
-                                  @(product.TypeProduct?.ToLower() == "burger" ? "bg-danger" : 
-                                    product.TypeProduct?.ToLower() == "menu" ? "bg-success" : "bg-warning")">
-                                @{
-                                    var typeDisplay = product.TypeProduct switch
-                                    {
-                                        "BURGER" => "Burger",
-                                        "MENU" => "Menu", 
-                                        "COMPLEMENT" => "Complément",
-                                        _ => product.TypeProduct
-                                    };
-                                    
-                                    var icon = product.TypeProduct switch
-                                    {
-                                        "BURGER" => "fa-hamburger",
-                                        "MENU" => "fa-utensils",
-                                        "COMPLEMENT" => "fa-french-fries",
-                                        _ => "fa-box"
-                                    };
-                                }
-                                <i class="fas @icon"></i> @typeDisplay
-                            </span>
+                            @{
+                                var badgeClass = product.TypeProduct?.ToLower() == "burger" ? "badge-burger" : product.TypeProduct?.ToLower() == "menu" ? "badge-menu" : "badge-complement";
+                                var typeDisplay = product.TypeProduct switch { "BURGER" => "Burger", "MENU" => "Menu", "COMPLEMENT" => "Complément", _ => product.TypeProduct };
+                                var icon = product.TypeProduct switch { "BURGER" => "fa-hamburger", "MENU" => "fa-layer-group", "COMPLEMENT" => "fa-mug-hot", _ => "fa-tag" };
+                            }
+                            <span class="product-badge @badgeClass"><i class="fas @icon"></i> @typeDisplay</span>
+                            @if (product.TypeProduct == "MENU" && product.ReductionPourcentage > 0)
+                            {
+                                <span class="position-absolute top-0 end-0 m-2 badge bg-danger" style="border-radius:999px; padding:0.4rem 0.6rem; font-weight:800;">-@product.ReductionPourcentage%</span>
+                            }
                         </div>
-                        
-                        <div class="card-body d-flex flex-column">
+                        <div class="card-body">
                             <h5 class="card-title">@product.Libelle</h5>
-                            <p class="card-text text-muted flex-grow-1">
-                                @if (!string.IsNullOrEmpty(product.Description) && product.Description.Length > 80)
+                            <p class="card-text">
+                                @if (!string.IsNullOrEmpty(product.Description) && product.Description.Length > 72)
                                 {
-                                    @product.Description.Substring(0, 80)<text>...</text>
+                                    @product.Description.Substring(0, 72)<text>…</text>
                                 }
                                 else
                                 {
                                     @product.Description
                                 }
                             </p>
-                            <div class="d-flex justify-content-between align-items-center mt-auto">
-                                <span class="h5 text-success mb-0">@product.Prix.ToString("N0") FCFA</span>
-                                <a href="@Url.Action("Details", "Home", new { id = product.Id })" 
-                                   class="btn btn-outline-primary">
-                                    <i class="fas fa-eye"></i> Voir
-                                </a>
+                            <div class="d-flex align-items-end justify-content-between mt-auto pt-2">
+                                <div>
+                                    @if (product.TypeProduct == "MENU" && product.PrixOriginal > 0)
+                                    {
+                                        <div class="price-original">@product.PrixOriginal.ToString("N0") FCFA</div>
+                                    }
+                                    <div class="price-tag">@product.Prix.ToString("N0") <small>FCFA</small></div>
+                                </div>
+                                <a href="@Url.Action("Details", "Home", new { id = product.Id })" class="btn btn-outline-primary btn-sm" style="border-radius:999px;" aria-label="Voir @product.Libelle"><i class="fas fa-eye"></i></a>
                             </div>
+                        </div>
+                        <div class="card-footer d-flex gap-2">
+                            <a href="@Url.Action("Details", "Home", new { id = product.Id })" class="btn btn-outline-primary btn-sm flex-fill">Détails</a>
+                            <form asp-controller="Cart" asp-action="Add" method="post" class="flex-fill">
+                                <input type="hidden" name="productId" value="@product.Id" />
+                                <input type="hidden" name="quantity" value="1" />
+                                <button type="submit" class="btn btn-primary btn-sm w-100"><i class="fas fa-shopping-bag"></i> Ajouter</button>
+                            </form>
                         </div>
                     </div>
                 </div>
@@ -226,48 +223,19 @@
         }
     </div>
 </div>
-
-<style>
-    .product-card {
-        transition: transform 0.3s, box-shadow 0.3s;
-        border: 1px solid #e0e0e0;
-        border-radius: 10px;
-        overflow: hidden;
-    }
-    .product-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 5px 20px rgba(0,0,0,0.15);
-    }
-    
-    .badge {
-        font-size: 0.7rem;
-        padding: 5px 10px;
-    }
-    
-    .bg-danger {
-        background-color: #ff6b6b !important;
-        color: white !important;
-    }
-    
-    .bg-success {
-        background-color: #4ecdc4 !important;
-        color: white !important;
-    }
-    
-    .bg-warning {
-        background-color: #ffe66d !important;
-        color: #333 !important;
-    }
-</style>
-
 @section Scripts {
     <script>
-        $(document).ready(function() {
-            // Effacer les filtres
-            $('.btn-close').on('click', function(e) {
+        $(function(){
+            
+            $(''a[href="#catalogue"]'').on(''click'', function(e){
                 e.preventDefault();
-                window.location.href = '/';
+                document.querySelector(''#catalogue'')?.scrollIntoView({behavior:''smooth'', block:''start''});
             });
+
+            const obs = new IntersectionObserver((entries)=>{
+                entries.forEach(ent=>{ if(ent.isIntersecting) ent.target.classList.add(''visible''); });
+            }, {threshold:0.08});
+            document.querySelectorAll(''.reveal'').forEach(el=>obs.observe(el));
         });
     </script>
 }
