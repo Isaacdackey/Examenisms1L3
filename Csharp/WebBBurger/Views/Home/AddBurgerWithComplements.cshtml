@@ -110,8 +110,8 @@
                             <div class="p-3 mb-4" style="background:var(--gray-50); border:1px solid var(--gray-100); border-radius: var(--radius-md);">
                                 <h6 class="mb-2" style="font-weight:700;"><i class="fas fa-receipt me-1" style="color:var(--primary)"></i> Récapitulatif</h6>
                                 <div class="d-flex justify-content-between" style="font-size:0.92rem;"><span>Burger × <span id="displayQty">1</span></span><span>@prix.ToString("N0") FCFA</span></div>
-                                <div id="boissonLine" class="d-flex justify-content-between" style="font-size:0.92rem; display:none !important;"><span>Boisson × <span id="boissonQty">1</span></span><span>+<span id="boissonPrice">0</span> FCFA</span></div>
-                                <div id="fritesLine" class="d-flex justify-content-between" style="font-size:0.92rem; display:none !important;"><span>Frites × <span id="fritesQty">1</span></span><span>+<span id="fritesPrice">0</span> FCFA</span></div>
+                                <div id="boissonLine" class="d-flex justify-content-between" style="font-size:0.92rem; display:none;"><span>Boisson × <span id="boissonQty">1</span></span><span>+<span id="boissonPrice">0</span> FCFA</span></div>
+                                <div id="fritesLine" class="d-flex justify-content-between" style="font-size:0.92rem; display:none;"><span>Frites × <span id="fritesQty">1</span></span><span>+<span id="fritesPrice">0</span> FCFA</span></div>
                                 <hr class="my-2">
                                 <div class="d-flex justify-content-between fw-bold"><span>Total</span><span class="price-tag" id="totalPrice">@prix.ToString("N0") FCFA</span></div>
                             </div>
@@ -133,18 +133,52 @@
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
     <script>
-        $(function(){
-            function calc(){
-                let bp=@prix; let q=parseInt($(''#quantityInput'').val())||1; $(''#displayQty'').text(q);
-                let bP=0, fP=0;
-                let bSel=$(''#boissonSelect'').find('':selected''); if(bSel.val()!==''''){ bP=parseFloat(bSel.data(''price''))||0; $(''#boissonLine'').show().css(''display'',''flex''); $(''#boissonPrice'').text(bP.toLocaleString(''fr-FR'')); $(''#boissonQty'').text(q); } else $(''#boissonLine'').hide();
-                let fSel=$(''#fritesSelect'').find('':selected''); if(fSel.val()!==''''){ fP=parseFloat(fSel.data(''price''))||0; $(''#fritesLine'').show().css(''display'',''flex''); $(''#fritesPrice'').text(fP.toLocaleString(''fr-FR'')); $(''#fritesQty'').text(q); } else $(''#fritesLine'').hide();
-                let total=(bp+bP+fP)*q; $(''#totalPrice'').text(total.toLocaleString(''fr-FR'')+'' FCFA'');
+        // Recap dynamique - global pour que les boutons inline fonctionnent meme avant DOM ready
+        var burgerBasePrice = @prix;
+        function calcBurgerRecap(){
+            var q = parseInt(document.getElementById(''quantityInput'')?.value)||1;
+            var bP=0, fP=0;
+            var bSel = document.getElementById(''boissonSelect'');
+            if(bSel && bSel.value !== ''''){
+                var opt = bSel.options[bSel.selectedIndex];
+                bP = parseFloat(opt.getAttribute(''data-price''))||0;
+                document.getElementById(''boissonLine'').style.display=''flex'';
+                document.getElementById(''boissonPrice'').textContent = bP.toLocaleString(''fr-FR'');
+                document.getElementById(''boissonQty'').textContent = q;
+            } else {
+                var bl=document.getElementById(''boissonLine''); if(bl) bl.style.display=''none'';
             }
-            window.changeQuantity=function(d){ let i=$(''#quantityInput''); let v=parseInt(i.val())||1; v=Math.min(10,Math.max(1,v+d)); i.val(v); calc(); };
-            $(''#boissonSelect,#fritesSelect'').on(''change'', calc); calc();
+            var fSel = document.getElementById(''fritesSelect'');
+            if(fSel && fSel.value !== ''''){
+                var opt2 = fSel.options[fSel.selectedIndex];
+                fP = parseFloat(opt2.getAttribute(''data-price''))||0;
+                document.getElementById(''fritesLine'').style.display=''flex'';
+                document.getElementById(''fritesPrice'').textContent = fP.toLocaleString(''fr-FR'');
+                document.getElementById(''fritesQty'').textContent = q;
+            } else {
+                var fl=document.getElementById(''fritesLine''); if(fl) fl.style.display=''none'';
+            }
+            document.getElementById(''displayQty'').textContent = q;
+            var total=(burgerBasePrice+bP+fP)*q;
+            document.getElementById(''totalPrice'').textContent = total.toLocaleString(''fr-FR'')+'' FCFA'';
+        }
+        // Override site.js fallback des que possible
+        window.changeQuantity = function(d){
+            var inp=document.getElementById(''quantityInput'') || document.getElementById(''quantity'');
+            if(!inp) return;
+            var v=parseInt(inp.value)||1;
+            v=Math.min(10,Math.max(1,v+d));
+            inp.value=v;
+            inp.dispatchEvent(new Event(''change''));
+            calcBurgerRecap();
+        };
+        $(function(){
+            $(''#boissonSelect,#fritesSelect'').on(''change'', calcBurgerRecap);
+            $(''#quantityInput'').on(''change input'', calcBurgerRecap);
+            calcBurgerRecap();
             $(''#burgerForm'').on(''submit'', function(){ $(this).find(''button[type="submit"]'').html(''<i class="fas fa-spinner fa-spin me-2"></i>Traitement...'').prop(''disabled'',true); });
         });
     </script>
 }
+
 
