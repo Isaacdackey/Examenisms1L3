@@ -428,3 +428,11 @@ img { max-width:100%; }
 .quantity-selector input::-webkit-outer-spin-button, .quantity-selector input::-webkit-inner-spin-button{ -webkit-appearance:none; margin:0; }
 
 
+@media (max-width: 576px) {
+  .product-card .card-footer { flex-direction: column; gap: 0.6rem; }
+  .product-card .card-footer .btn { font-size: 0.82rem; padding: 0.55rem 0.75rem; width: 100%; }
+  .product-card .card-footer form { width: 100%; }
+  .quantity-selector { gap: 0.35rem; padding: 0.25rem 0.35rem; width: 100% !important; max-width: 160px; }
+  .qty-btn { width: 32px; height: 32px; font-size: 0.95rem; }
+  .product-card .img-wrap { aspect-ratio: 1.1; }
+}

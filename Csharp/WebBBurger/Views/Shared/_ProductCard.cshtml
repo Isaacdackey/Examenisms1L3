@@ -52,7 +52,7 @@
             <span class="badge" style="background:var(--neutral-900); color:var(--white); border-radius:999px;">@Model.TypeProduct</span>
         </div>
     </div>
-    <div class="card-footer d-flex gap-2">
+    <div class="card-footer d-flex flex-wrap gap-2">
         <a asp-controller="Home" asp-action="Details" asp-route-id="@Model.Id" class="btn btn-outline-primary btn-sm flex-fill"><i class="fas fa-eye"></i> Détails</a>
         <form asp-controller="Cart" asp-action="Add" method="post" class="flex-fill">
             <input type="hidden" name="productId" value="@Model.Id" />
@@ -61,4 +61,5 @@
         </form>
     </div>
 </div>
+
 
