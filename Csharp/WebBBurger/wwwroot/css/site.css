@@ -1,4 +1,4 @@
-﻿/* =========================================================
+/* =========================================================
    BRASIL BURGER — PREMIUM DESIGN SYSTEM
    Organisé par sections : Variables | Base | Navbar | Buttons | Cards | Hero | Filters | Forms | Alerts | Footer | Cart/Checkout | Auth | Profile | Animations | Responsive
    ========================================================= */
@@ -435,4 +435,35 @@ img { max-width:100%; }
   .quantity-selector { gap: 0.35rem; padding: 0.25rem 0.35rem; width: 100% !important; max-width: 160px; }
   .qty-btn { width: 32px; height: 32px; font-size: 0.95rem; }
   .product-card .img-wrap { aspect-ratio: 1.1; }
+}
+
+/* ========== 16. MOBILE STICKY CHECKOUT & MICRO-INTERACTIONS ========== */
+.mobile-sticky-checkout {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-top: 1px solid var(--gray-200);
+  padding: 0.75rem 1.25rem;
+  z-index: 1040;
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.08);
+  animation: slideInUp 0.3s ease-out;
+}
+
+@keyframes slideInUp {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+
+.cart-badge.pulse {
+  animation: badgeBounce 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes badgeBounce {
+  0% { transform: scale(0.6); opacity: 0; }
+  50% { transform: scale(1.25); }
+  100% { transform: scale(1); opacity: 1; }
 }

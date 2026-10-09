@@ -1,4 +1,4 @@
-﻿@model WebBBurger.Models.ViewModels.ProductViewModel
+@model WebBBurger.Models.ViewModels.ProductViewModel
 <div class="card product-card h-100">
     <div class="img-wrap">
         <img src="@Model.ImageUrl" class="card-img-top" alt="@Model.Libelle" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'" />
@@ -53,12 +53,20 @@
         </div>
     </div>
     <div class="card-footer d-flex flex-wrap gap-2">
-        <a asp-controller="Home" asp-action="Details" asp-route-id="@Model.Id" class="btn btn-outline-primary btn-sm flex-fill"><i class="fas fa-eye"></i> Détails</a>
-        <form asp-controller="Cart" asp-action="Add" method="post" class="flex-fill">
-            <input type="hidden" name="productId" value="@Model.Id" />
-            <input type="hidden" name="quantity" value="1" />
-            <button type="submit" class="btn btn-primary btn-sm w-100"><i class="fas fa-shopping-bag"></i> Ajouter</button>
-        </form>
+        <a asp-controller="Home" asp-action="Details" asp-route-id="@Model.Id" class="btn btn-outline-secondary btn-sm flex-fill" style="border-radius:999px;"><i class="fas fa-eye"></i> Détails</a>
+        @if (Model.TypeProduct == "BURGER")
+        {
+            <a asp-controller="Home" asp-action="AddBurgerWithComplements" asp-route-id="@Model.Id" class="btn btn-primary btn-sm flex-fill" style="border-radius:999px; font-weight:700;"><i class="fas fa-sliders-h"></i> Personnaliser</a>
+        }
+        else
+        {
+            <form asp-controller="Cart" asp-action="Add" method="post" class="flex-fill m-0">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="productId" value="@Model.Id" />
+                <input type="hidden" name="quantity" value="1" />
+                <button type="submit" class="btn btn-primary btn-sm w-100" style="border-radius:999px; font-weight:700;"><i class="fas fa-shopping-bag"></i> Ajouter</button>
+            </form>
+        }
     </div>
 </div>
 
