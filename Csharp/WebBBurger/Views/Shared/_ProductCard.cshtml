@@ -30,7 +30,7 @@
         @if (Model.TypeProduct == "BURGER" && Model.Calories.HasValue)
         {
             <div class="d-flex gap-2 mb-2">
-                <span class="badge" style="background:var(--gray-100); color:var(--gray-700); border:1px solid var(--gray-200); border-radius:999px;"><i class="fas fa-fire text-danger me-1"></i> @Model.Calories kcal</span>
+                <span class="badge" style="background:var(--gray-100); color:var(--gray-700); border:1px solid var(--gray-200); border-radius:999px;"><i class="fa-solid fa-fire-flame-curved text-danger me-1"></i> @Model.Calories kcal</span>
                 @if (Model.TempsPreparation.HasValue)
                 {
                     <span class="badge" style="background:var(--gray-100); color:var(--gray-700); border:1px solid var(--gray-200); border-radius:999px;"><i class="fas fa-clock text-primary me-1"></i> @Model.TempsPreparation min</span>

@@ -1,4 +1,4 @@
-﻿@using WebBBurger.Models.ViewModels
+@using WebBBurger.Models.ViewModels
 @model WebBBurger.Models.ViewModels.BurgerDetailsViewModel
 @{
     var libelle = Model?.Libelle ?? "Burger";
@@ -40,7 +40,7 @@
                     {
                         <div class="d-flex flex-wrap gap-2 mt-3">
                             @if (!string.IsNullOrEmpty(typeBurger)){ <span class="badge" style="background:var(--gray-100); color:var(--gray-700); border:1px solid var(--gray-200); border-radius:999px;"><i class="fas fa-tag me-1"></i> @typeBurger</span> }
-                            @if (calories.HasValue){ <span class="badge" style="background:var(--gray-100); color:var(--gray-700); border:1px solid var(--gray-200); border-radius:999px;"><i class="fas fa-fire text-danger me-1"></i> @calories kcal</span> }
+                            @if (calories.HasValue){ <span class="badge" style="background:var(--gray-100); color:var(--gray-700); border:1px solid var(--gray-200); border-radius:999px;"><i class="fa-solid fa-fire-flame-curved text-danger me-1"></i> @calories kcal</span> }
                             @if (tempsPreparation.HasValue){ <span class="badge" style="background:var(--gray-100); color:var(--gray-700); border:1px solid var(--gray-200); border-radius:999px;"><i class="fas fa-clock text-primary me-1"></i> @tempsPreparation min</span> }
                         </div>
                     }

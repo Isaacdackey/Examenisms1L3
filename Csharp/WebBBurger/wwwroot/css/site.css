@@ -467,3 +467,9 @@ img { max-width:100%; }
   50% { transform: scale(1.25); }
   100% { transform: scale(1); opacity: 1; }
 }
+
+/* Fix icône flamme / calories pour Font Awesome 6 Free */
+.fa-fire:before,
+.fa-fire-alt:before {
+  content: "\f7e4" !important;
+}
