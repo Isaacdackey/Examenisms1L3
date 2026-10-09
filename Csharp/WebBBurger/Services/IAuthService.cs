@@ -8,6 +8,7 @@ namespace WebBBurger.Services
     {
         Task<(bool Success, string Message, User? User)> RegisterAsync(RegisterViewModel model);
         Task<(bool Success, string Message, User? User)> LoginAsync(LoginViewModel model);
+        Task LogoutAsync();
         void Logout();
         Task<User?> GetCurrentUserAsync();
         bool IsAuthenticated();
@@ -17,5 +18,6 @@ namespace WebBBurger.Services
         string? GetCurrentUserEmail();
         int? GetCurrentUserId();
         Task<(bool Success, string Message)> ChangePasswordAsync(int userId, string currentPassword, string newPassword);
+        Task<(bool Success, string Message)> UpdateProfileAsync(int userId, EditProfileViewModel model);
     }
 }

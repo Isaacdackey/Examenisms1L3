@@ -121,5 +121,28 @@ namespace WebBBurger.Repositories.Impl
             await _context.SaveChangesAsync();
             return true;
         }
+
+        public async Task<IEnumerable<Product>> SearchAsync(string? query, string? type = null)
+        {
+            var q = _context.Products
+                .Include(p => p.Burger)
+                .Include(p => p.Complement)
+                .Include(p => p.Menu)
+                .Where(p => !p.IsArchived);
+
+            if (!string.IsNullOrWhiteSpace(type))
+            {
+                q = q.Where(p => p.TypeProduct == type);
+            }
+
+            if (!string.IsNullOrWhiteSpace(query))
+            {
+                var lower = query.Trim().ToLower();
+                q = q.Where(p => EF.Functions.ILike(p.Libelle, $"%{lower}%") ||
+                                 (p.Description != null && EF.Functions.ILike(p.Description, $"%{lower}%")));
+            }
+
+            return await q.OrderByDescending(p => p.CreatedAt).ToListAsync();
+        }
     }
 }

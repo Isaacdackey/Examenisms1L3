@@ -14,6 +14,7 @@ namespace WebBBurger.Services
         Task ClearCartAsync();
         int GetCartItemCount();
         decimal GetCartTotal();
+        Task<decimal> GetCartTotalAsync();
         
         Task AddBurgerWithComplementsAsync(int burgerId, int quantity, 
             int? boissonId = null, int? fritesId = null);

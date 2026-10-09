@@ -17,5 +17,6 @@ namespace WebBBurger.Repositories
         Task<Product> UpdateAsync(Product product);
         Task<bool> ArchiveAsync(int id);
         Task<bool> UnarchiveAsync(int id);
+        Task<IEnumerable<Product>> SearchAsync(string? query, string? type = null);
     }
 }

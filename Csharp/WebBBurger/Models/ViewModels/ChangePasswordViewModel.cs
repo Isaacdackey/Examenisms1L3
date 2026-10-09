@@ -20,5 +20,11 @@ namespace WebBBurger.Models.ViewModels
         [DataType(DataType.Password)]
         [Compare("NewPassword", ErrorMessage = "Les mots de passe ne correspondent pas")]
         public string? ConfirmPassword { get; set; }
+
+        public string? ConfirmNewPassword
+        {
+            get => ConfirmPassword;
+            set => ConfirmPassword = value;
+        }
     }
 }

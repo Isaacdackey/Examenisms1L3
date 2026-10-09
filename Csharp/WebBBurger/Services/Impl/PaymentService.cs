@@ -1,7 +1,11 @@
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using WebBBurger.Models;
 using WebBBurger.Repositories;
+using WebBBurger.Services;
+using WebBBurger.Utils;
 
 namespace WebBBurger.Services.Impl
 {
@@ -9,35 +13,38 @@ namespace WebBBurger.Services.Impl
     {
         private readonly IPaymentRepository _paymentRepository;
         private readonly ICommandeRepository _commandeRepository;
+        private readonly ILogger<PaymentService> _logger;
 
         public PaymentService(
             IPaymentRepository paymentRepository,
-            ICommandeRepository commandeRepository)
+            ICommandeRepository commandeRepository,
+            ILogger<PaymentService> logger)
         {
             _paymentRepository = paymentRepository;
             _commandeRepository = commandeRepository;
+            _logger = logger;
         }
 
         public async Task<Payment?> CreatePaymentAsync(int commandeId, decimal montant, string moyenPaiement)
         {
             try
             {
-    
                 var commande = await _commandeRepository.GetByIdAsync(commandeId);
                 if (commande == null)
                 {
                     throw new ArgumentException($"Commande avec l'ID {commandeId} non trouvée.");
                 }
 
-                if (commande.Statut == "PAYE" || commande.Statut == "TERMINEE")
+                if (commande.Statut == "TERMINEE")
                 {
-                    throw new InvalidOperationException("Cette commande est déjà payée.");
+                    throw new InvalidOperationException("Cette commande est déjà terminée.");
                 }
 
-                var validMoyens = new[] { "WAVE", "ORANGE_MONEY", "CARTE", "ESPECES" };
-                if (!Array.Exists(validMoyens, m => m.Equals(moyenPaiement, StringComparison.OrdinalIgnoreCase)))
+                var normalizedMoyen = (moyenPaiement ?? "ESPECES").Trim().ToUpperInvariant();
+                var validMoyens = new HashSet<string> { "WAVE", "ORANGE_MONEY", "CARTE", "ESPECES" };
+                if (!validMoyens.Contains(normalizedMoyen))
                 {
-                    throw new ArgumentException($"Moyen de paiement '{moyenPaiement}' invalide.");
+                    normalizedMoyen = "ESPECES";
                 }
 
                 var existingPayments = await _paymentRepository.GetByCommandeIdAsync(commandeId);
@@ -45,36 +52,29 @@ namespace WebBBurger.Services.Impl
                 {
                     if (existingPayment.StatutPaiement == "EN_ATTENTE")
                     {
-                        throw new InvalidOperationException("Un paiement est déjà en attente pour cette commande.");
+                        return existingPayment;
                     }
                 }
 
-                
                 var payment = new Payment
                 {
                     CommandeId = commandeId,
                     Montant = montant,
-                    MoyenPaiement = moyenPaiement.ToUpper(),
+                    MoyenPaiement = normalizedMoyen,
                     ReferenceTransaction = GeneratePaymentReference(),
-                    StatutPaiement = "EN_ATTENTE",
+                    StatutPaiement = "EN_ATTENTE", // Reste en attente même pour les espèces jusqu'à encaissement réel
                     CreatedAt = DateTime.UtcNow
                 };
 
-
-                if (moyenPaiement.ToUpper() == "ESPECES")
-                {
-                    payment.StatutPaiement = "PAYE";
-                    payment.DatePaiement = DateTime.UtcNow;
-                }
-
                 var createdPayment = await _paymentRepository.CreateAsync(payment);
+                _logger.LogInformation("Paiement créé : ID={PaymentId}, Réf={Reference}, Méthode={Method}",
+                    createdPayment.Id, createdPayment.ReferenceTransaction, createdPayment.MoyenPaiement);
 
                 return createdPayment;
             }
             catch (Exception ex)
             {
-
-                Console.WriteLine($"Erreur lors de la création du paiement: {ex.Message}");
+                _logger.LogError(ex, "Erreur lors de la création du paiement pour la commande {OrderId}", commandeId);
                 return null;
             }
         }
@@ -94,75 +94,60 @@ namespace WebBBurger.Services.Impl
                     throw new KeyNotFoundException($"Paiement avec la référence '{referenceTransaction}' non trouvé.");
                 }
 
-                
                 if (payment.StatutPaiement == "PAYE")
                 {
                     return true;
                 }
 
-                
                 if (payment.StatutPaiement == "ANNULE" || payment.StatutPaiement == "ECHEC")
                 {
-                    throw new InvalidOperationException($"Le paiement est {payment.StatutPaiement.ToLower()}.");
+                    throw new InvalidOperationException($"Le paiement est déjà {payment.StatutPaiement.ToLower()}.");
                 }
 
-                
                 bool isPaymentSuccessful = await SimulatePaymentValidation(payment);
 
                 if (isPaymentSuccessful)
                 {
-                    
                     payment.StatutPaiement = "PAYE";
                     payment.DatePaiement = DateTime.UtcNow;
                     await _paymentRepository.UpdateAsync(payment);
 
-
                     var commande = await _commandeRepository.GetByIdAsync(payment.CommandeId);
                     if (commande != null)
                     {
-                        commande.Statut = "PAYE";
+                        commande.Statut = "VALIDEE";
                         commande.UpdatedAt = DateTime.UtcNow;
                         await _commandeRepository.UpdateAsync(commande);
                     }
 
+                    _logger.LogInformation("Paiement validé avec succès pour Réf={Reference}", referenceTransaction);
                     return true;
                 }
                 else
                 {
                     payment.StatutPaiement = "ECHEC";
                     await _paymentRepository.UpdateAsync(payment);
+                    _logger.LogWarning("Échec de la validation du paiement pour Réf={Reference}", referenceTransaction);
                     return false;
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Erreur lors de la validation du paiement: {ex.Message}");
+                _logger.LogError(ex, "Erreur lors de la validation du paiement Réf={Reference}", referenceTransaction);
                 return false;
             }
         }
 
         public string GeneratePaymentReference()
         {
-
-            var timestamp = DateTime.UtcNow.ToString("yyyyMMddHHmmss");
-            var guidPart = Guid.NewGuid().ToString().Substring(0, 8).ToUpper();
-            return $"PAY-{timestamp}-{guidPart}";
+            return NumberGenerator.GeneratePaymentReference();
         }
-
-        
 
         private async Task<bool> SimulatePaymentValidation(Payment payment)
         {
-            
-            
             await Task.Delay(100);
-            
-            
-            var random = new Random();
-            return random.Next(1, 11) > 1;
+            return true; // Simulation réussie
         }
-
-        
 
         public async Task<Payment?> GetPaymentByReferenceAsync(string reference)
         {
@@ -174,17 +159,12 @@ namespace WebBBurger.Services.Impl
             try
             {
                 var payment = await _paymentRepository.GetByIdAsync(paymentId);
-                if (payment == null)
-                {
-                    return false;
-                }
+                if (payment == null) return false;
 
-                
                 if (payment.StatutPaiement == "PAYE")
                 {
-                    throw new InvalidOperationException("Impossible d'annuler un paiement réussi.");
+                    throw new InvalidOperationException("Impossible d'annuler un paiement déjà validé.");
                 }
-
 
                 payment.StatutPaiement = "ANNULE";
                 await _paymentRepository.UpdateAsync(payment);
@@ -193,7 +173,7 @@ namespace WebBBurger.Services.Impl
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Erreur lors de l'annulation du paiement: {ex.Message}");
+                _logger.LogError(ex, "Erreur lors de l'annulation du paiement ID={PaymentId}", paymentId);
                 return false;
             }
         }

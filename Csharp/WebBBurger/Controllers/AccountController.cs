@@ -79,9 +79,9 @@ namespace WebBBurger.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Logout()
+        public async Task<IActionResult> Logout()
         {
-            _authService.Logout();
+            await _authService.LogoutAsync();
             TempData["SuccessMessage"] = "Déconnexion réussie.";
             return RedirectToAction("Index", "Home");
         }

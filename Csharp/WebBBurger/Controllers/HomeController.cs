@@ -53,12 +53,7 @@ namespace WebBBurger.Controllers
                 else if (!string.IsNullOrEmpty(search))
                 {
                     _logger.LogInformation("Recherche par texte: {Search}", search);
-                    
-                    var all = await _productService.GetAllProductsAsync();
-                    allProducts = all.Where(p => 
-                        (p.Libelle != null && p.Libelle.Contains(search, StringComparison.OrdinalIgnoreCase)) ||
-                        (p.Description != null && p.Description.Contains(search, StringComparison.OrdinalIgnoreCase))
-                    ).ToList();
+                    allProducts = await _productService.SearchProductsAsync(search);
                 }
                 else
                 {

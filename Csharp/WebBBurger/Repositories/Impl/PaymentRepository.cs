@@ -178,7 +178,7 @@ namespace WebBBurger.Repositories.Impl
 
         public async Task<IEnumerable<Payment>> GetCanceledPaymentsAsync()
         {
-            return await GetByStatutAsync("ECHEC");
+            return await GetByStatutAsync("ANNULE");
         }
 
         public async Task<decimal> GetTotalAmountByDateAsync(DateTime date)

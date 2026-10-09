@@ -2,10 +2,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
-using System.Text.Json;
-using WebBBurger.Models;
 using WebBBurger.Models.ViewModels;
 using WebBBurger.Services;
+using WebBBurger.Utils;
 
 namespace WebBBurger.Services.Impl
 {
@@ -15,8 +14,7 @@ namespace WebBBurger.Services.Impl
         private readonly IProductService _productService;
         private const string CartSessionKey = "Cart";
 
-
-        private class CartItemSession
+        public class CartItemSession
         {
             public int ProductId { get; set; }
             public int Quantity { get; set; }
@@ -28,39 +26,22 @@ namespace WebBBurger.Services.Impl
             _productService = productService;
         }
 
-    
         public async Task AddToCartAsync(CartItemViewModel item)
         {
-            
-            var cartItems = GetCartItems();
-            var existingItem = cartItems.FirstOrDefault(i => i.ProductId == item.ProductId);
-            
-            if (existingItem != null)
-            {
-                existingItem.Quantity += item.Quantite;
-            }
-            else
-            {
-                cartItems.Add(new CartItemSession
-                {
-                    ProductId = item.ProductId,
-                    Quantity = item.Quantite
-                });
-            }
-            
-            SaveCartItems(cartItems);
-            await Task.CompletedTask;
+            await AddToCartAsync(item.ProductId, item.Quantite);
         }
 
         public async Task AddToCartAsync(int productId, int quantity = 1)
         {
+            if (quantity <= 0) return;
+
             var product = await _productService.GetProductByIdAsync(productId);
             if (product == null || product.IsArchived)
                 return;
 
             var cartItems = GetCartItems();
             var existingItem = cartItems.FirstOrDefault(i => i.ProductId == productId);
-            
+
             if (existingItem != null)
             {
                 existingItem.Quantity += quantity;
@@ -73,20 +54,23 @@ namespace WebBBurger.Services.Impl
                     Quantity = quantity
                 });
             }
-            
+
             SaveCartItems(cartItems);
         }
 
-        public async Task AddBurgerWithComplementsAsync(int burgerId, int quantity, 
-            int? boissonId = null, int? fritesId = null)
+        public async Task AddBurgerWithComplementsAsync(
+            int burgerId,
+            int quantity,
+            int? boissonId = null,
+            int? fritesId = null)
         {
             await AddToCartAsync(burgerId, quantity);
-            
+
             if (boissonId.HasValue)
             {
                 await AddToCartAsync(boissonId.Value, quantity);
             }
-            
+
             if (fritesId.HasValue)
             {
                 await AddToCartAsync(fritesId.Value, quantity);
@@ -122,49 +106,48 @@ namespace WebBBurger.Services.Impl
             return cartViewModel;
         }
 
-        public async Task RemoveFromCartAsync(int productId)
+        public Task RemoveFromCartAsync(int productId)
         {
             var cartItems = GetCartItems();
             var itemToRemove = cartItems.FirstOrDefault(item => item.ProductId == productId);
-            
+
             if (itemToRemove != null)
             {
                 cartItems.Remove(itemToRemove);
                 SaveCartItems(cartItems);
             }
-            
-            await Task.CompletedTask;
+
+            return Task.CompletedTask;
         }
 
-        public async Task UpdateQuantityAsync(int productId, int quantity)
+        public Task UpdateQuantityAsync(int productId, int quantity)
         {
             if (quantity <= 0)
             {
-                await RemoveFromCartAsync(productId);
-                return;
+                return RemoveFromCartAsync(productId);
             }
 
             var cartItems = GetCartItems();
             var existingItem = cartItems.FirstOrDefault(item => item.ProductId == productId);
-            
+
             if (existingItem != null)
             {
                 existingItem.Quantity = quantity;
                 SaveCartItems(cartItems);
             }
-            
-            await Task.CompletedTask;
+
+            return Task.CompletedTask;
         }
 
-        public async Task ClearCartAsync()
+        public Task ClearCartAsync()
         {
-            var httpContext = _httpContextAccessor.HttpContext;
-            if (httpContext != null)
+            var session = _httpContextAccessor.HttpContext?.Session;
+            if (session != null)
             {
-                httpContext.Session.Remove(CartSessionKey);
+                session.Remove(CartSessionKey);
             }
-            
-            await Task.CompletedTask;
+
+            return Task.CompletedTask;
         }
 
         public int GetCartItemCount()
@@ -173,81 +156,37 @@ namespace WebBBurger.Services.Impl
             return cartItems.Sum(item => item.Quantity);
         }
 
-        public decimal GetCartTotal()
+        public async Task<decimal> GetCartTotalAsync()
         {
-            var cartItems = GetCartItems();
-            decimal total = 0;
-            
-            foreach (var item in cartItems)
-            {
-                var product = _productService.GetProductByIdAsync(item.ProductId).GetAwaiter().GetResult();
-                if (product != null && !product.IsArchived)
-                {
-                    total += product.Prix * item.Quantity;
-                }
-            }
-            
-            return total;
+            var cart = await GetCartAsync();
+            return cart.Total;
         }
 
-        
+        public decimal GetCartTotal()
+        {
+            // Calcul rapide synchrone sans bloquer avec GetAwaiter si possible,
+            // ou délégation asynchrone si le contexte l'exige.
+            var cartItems = GetCartItems();
+            if (cartItems.Count == 0) return 0;
+
+            return GetCartTotalAsync().ConfigureAwait(false).GetAwaiter().GetResult();
+        }
+
         private List<CartItemSession> GetCartItems()
         {
-            var httpContext = _httpContextAccessor.HttpContext;
-            if (httpContext == null || httpContext.Session == null) 
-                return new List<CartItemSession>();
+            var session = _httpContextAccessor.HttpContext?.Session;
+            if (session == null) return new List<CartItemSession>();
 
-            var cartJson = httpContext.Session.GetString(CartSessionKey);
-            if (string.IsNullOrEmpty(cartJson))
-                return new List<CartItemSession>();
-
-            return JsonSerializer.Deserialize<List<CartItemSession>>(cartJson) ?? new List<CartItemSession>();
+            return session.Get<List<CartItemSession>>(CartSessionKey) ?? new List<CartItemSession>();
         }
 
         private void SaveCartItems(List<CartItemSession> cartItems)
         {
-            var httpContext = _httpContextAccessor.HttpContext;
-            if (httpContext != null && httpContext.Session != null)
+            var session = _httpContextAccessor.HttpContext?.Session;
+            if (session != null)
             {
-                var cartJson = JsonSerializer.Serialize(cartItems);
-                httpContext.Session.SetString(CartSessionKey, cartJson);
+                session.Set(CartSessionKey, cartItems);
             }
-        }
-
-        
-        private List<CartItemViewModel> GetCartFromSession()
-        {
-            var cartItems = GetCartItems();
-            var result = new List<CartItemViewModel>();
-            
-            foreach (var item in cartItems)
-            {
-                var product = _productService.GetProductByIdAsync(item.ProductId).GetAwaiter().GetResult();
-                if (product != null)
-                {
-                    result.Add(new CartItemViewModel
-                    {
-                        ProductId = item.ProductId,
-                        Quantite = item.Quantity,
-                        Libelle = product.Libelle ?? "Produit sans nom",
-                        Prix = product.Prix
-                    });
-                }
-            }
-            
-            return result;
-        }
-
-        private void SaveCartToSession(List<CartItemViewModel> cartItems)
-        {
-            
-            var sessionItems = cartItems.Select(item => new CartItemSession
-            {
-                ProductId = item.ProductId,
-                Quantity = item.Quantite
-            }).ToList();
-            
-            SaveCartItems(sessionItems);
         }
     }
 }

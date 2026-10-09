@@ -1,21 +1,27 @@
 using System;
 
-
 namespace WebBBurger.Utils
 {
     public static class NumberGenerator
     {
+        public static string GenerateOrderNumber()
+        {
+            var date = DateTime.UtcNow.ToString("yyyyMMdd");
+            var uniqueSuffix = Guid.NewGuid().ToString("N")[..6].ToUpperInvariant();
+            return $"CMD-{date}-{uniqueSuffix}";
+        }
+
         public static string GenerateOrderNumber(int nextId)
         {
-            var date = DateTime.Now.ToString("yyyyMMdd");
-            return $"CMD-{date}-{nextId.ToString().PadLeft(4, '0')}";
+            var date = DateTime.UtcNow.ToString("yyyyMMdd");
+            return $"CMD-{date}-{nextId:D4}";
         }
 
         public static string GeneratePaymentReference()
         {
-            var timestamp = DateTime.Now.ToString("yyyyMMddHHmmss");
-            var random = new Random().Next(1000, 9999);
-            return $"PAY-{timestamp}-{random}";
+            var timestamp = DateTime.UtcNow.ToString("yyyyMMddHHmmss");
+            var uniqueSuffix = Guid.NewGuid().ToString("N")[..8].ToUpperInvariant();
+            return $"PAY-{timestamp}-{uniqueSuffix}";
         }
     }
 }

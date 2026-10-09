@@ -30,8 +30,15 @@ namespace WebBBurger.Repositories.Impl
 
         public async Task<User?> GetByEmailAndPasswordAsync(string email, string password)
         {
-            return await _context.Users
-                .FirstOrDefaultAsync(u => u.Email.ToLower() == email.ToLower() && u.Password == password);
+            var user = await GetByEmailAsync(email);
+            if (user == null) return null;
+
+            if (user.Password.StartsWith("$2") && BCrypt.Net.BCrypt.EnhancedVerify(password, user.Password))
+            {
+                return user;
+            }
+
+            return user.Password == password ? user : null;
         }
 
         public async Task<User?> GetUserByPhoneAsync(string phone)

@@ -104,23 +104,7 @@ namespace WebBBurger.Services.Impl
 
         public async Task<IEnumerable<Product>> SearchProductsAsync(string query, string? type = null)
         {
-            var products = await _productRepository.GetActiveProductsAsync();
-            
-            if (!string.IsNullOrEmpty(query))
-            {
-                query = query.ToLower();
-                products = products.Where(p => 
-                    p.Libelle.ToLower().Contains(query) || 
-                    (p.Description != null && p.Description.ToLower().Contains(query)))
-                    .ToList();
-            }
-
-            if (!string.IsNullOrEmpty(type))
-            {
-                products = products.Where(p => p.TypeProduct == type).ToList();
-            }
-
-            return products;
+            return await _productRepository.SearchAsync(query, type);
         }
 
         

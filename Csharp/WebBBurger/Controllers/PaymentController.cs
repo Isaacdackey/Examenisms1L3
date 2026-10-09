@@ -7,6 +7,8 @@ using System;
 using Microsoft.AspNetCore.Authorization;
 using System.Linq;
 
+using Microsoft.Extensions.Logging;
+
 namespace WebBBurger.Controllers
 {
     public class PaymentController : Controller
@@ -15,17 +17,20 @@ namespace WebBBurger.Controllers
         private readonly ICommandeRepository _commandeRepository;
         private readonly IPaymentRepository _paymentRepository;
         private readonly IAuthService _authService;
+        private readonly ILogger<PaymentController> _logger;
 
         public PaymentController(
             IPaymentService paymentService,
             ICommandeRepository commandeRepository,
             IPaymentRepository paymentRepository,
-            IAuthService authService) 
+            IAuthService authService,
+            ILogger<PaymentController> logger) 
         {
             _paymentService = paymentService;
             _commandeRepository = commandeRepository;
             _paymentRepository = paymentRepository;
             _authService = authService;
+            _logger = logger;
         }
 
         [HttpGet]
@@ -135,51 +140,55 @@ namespace WebBBurger.Controllers
         }
 
         [HttpGet]
-        [AllowAnonymous]
         public async Task<IActionResult> Confirm(string referenceTransaction)
         {
-            Console.WriteLine($"=== CONFIRM Paiement Réf: {referenceTransaction} ===");
-            
-            if (string.IsNullOrEmpty(referenceTransaction))
+            _logger.LogInformation("Demande de confirmation pour le paiement Réf={Reference}", referenceTransaction);
+
+            if (string.IsNullOrWhiteSpace(referenceTransaction))
             {
-                Console.WriteLine("Référence vide");
                 TempData["ErrorMessage"] = "Référence de transaction invalide.";
                 return RedirectToAction("Index", "Home");
             }
 
-            Console.WriteLine($"🔍 Validation du paiement...");
+            var payment = await _paymentRepository.GetByReferenceAsync(referenceTransaction);
+            if (payment == null)
+            {
+                TempData["ErrorMessage"] = "Paiement introuvable.";
+                return RedirectToAction("Index", "Home");
+            }
+
+            var commande = await _commandeRepository.GetByIdAsync(payment.CommandeId);
+            if (commande == null)
+            {
+                TempData["ErrorMessage"] = "Commande introuvable.";
+                return RedirectToAction("Index", "Home");
+            }
+
+            var currentUserId = _authService.GetCurrentUserId();
+            if (currentUserId.HasValue && commande.UserId != currentUserId.Value)
+            {
+                _logger.LogWarning("Accès interdit au paiement Réf={Reference} par l'utilisateur ID={UserId}",
+                    referenceTransaction, currentUserId.Value);
+                TempData["ErrorMessage"] = "Cette commande ne vous appartient pas.";
+                return RedirectToAction("Orders", "Profile");
+            }
+
             var success = await _paymentService.ValidatePaymentAsync(referenceTransaction);
-            
             if (success)
             {
-                Console.WriteLine($"Paiement validé avec succès");
-                var payment = await _paymentRepository.GetByReferenceAsync(referenceTransaction);
-                if (payment != null)
+                if (commande.Statut != "TERMINEE")
                 {
-                    Console.WriteLine($"Paiement trouvé: ID={payment.Id}, Commande={payment.CommandeId}");
-                    var commande = await _commandeRepository.GetByIdAsync(payment.CommandeId);
-                    
-                    
-                    if (commande != null && commande.Statut != "TERMINEE")
-                    {
-                        Console.WriteLine($"Mise à jour commande: {commande.Id} ({commande.Statut}) -> TERMINEE");
-                        commande.Statut = "TERMINEE";
-                        commande.UpdatedAt = DateTime.UtcNow;
-                        await _commandeRepository.UpdateAsync(commande);
-                    }
-
-                    Console.WriteLine($"Mise à jour paiement: DatePaiement, Statut=PAYE");
-                    payment.DatePaiement = DateTime.UtcNow;
-                    payment.StatutPaiement = "PAYE";
-                    await _paymentRepository.UpdateAsync(payment);
+                    commande.Statut = "TERMINEE";
+                    commande.UpdatedAt = DateTime.UtcNow;
+                    await _commandeRepository.UpdateAsync(commande);
                 }
 
                 TempData["SuccessMessage"] = "Paiement confirmé avec succès ! Votre commande est terminée.";
-                return RedirectToAction("Details", "Order", new { id = payment?.CommandeId ?? 0 });
+                return RedirectToAction("Details", "Order", new { id = payment.CommandeId });
             }
             else
             {
-                Console.WriteLine($"Échec validation paiement");
+                _logger.LogWarning("Échec de la validation du paiement pour Réf={Reference}", referenceTransaction);
                 TempData["ErrorMessage"] = "Erreur lors de la confirmation du paiement.";
                 return View("PaymentError");
             }

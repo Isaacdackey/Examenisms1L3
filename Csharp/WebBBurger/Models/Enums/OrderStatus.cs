@@ -21,7 +21,11 @@ namespace WebBBurger.Models.Enums
 
         public static OrderStatus FromDatabaseValue(string value)
         {
-            return Enum.Parse<OrderStatus>(value);
+            if (Enum.TryParse<OrderStatus>(value, true, out var result))
+            {
+                return result;
+            }
+            return OrderStatus.EN_ATTENTE;
         }
     }
 }

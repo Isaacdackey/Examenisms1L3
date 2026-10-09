@@ -97,10 +97,10 @@ namespace WebBBurger.Controllers
         }
 
         [HttpGet]
-        public JsonResult GetCartSummary()
+        public async Task<JsonResult> GetCartSummary()
         {
             var count = _cartService.GetCartItemCount();
-            var total = _cartService.GetCartTotal();
+            var total = await _cartService.GetCartTotalAsync();
             
             return Json(new { count, total });
         }
